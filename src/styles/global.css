@@ -77,6 +77,26 @@
 }
 
 /*
+  Cursor spotlight (index.astro). A very faint colour fading over a wide area only has a few 8-bit steps to work
+  with, and Chrome shows each step as a ring. So the glow is large and faint with an eased falloff, and a
+  faint grain on top (masked to the same circle) breaks the steps up.
+*/
+.spotlight {
+  --spot: 900px circle at var(--mx) var(--my);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    radial-gradient(
+      var(--spot),
+      rgb(203 166 247 / 0.05),
+      rgb(203 166 247 / 0.034) 20%,
+      rgb(203 166 247 / 0.018) 42%,
+      rgb(203 166 247 / 0.007) 65%,
+      transparent 90%
+    );
+  mask-image: radial-gradient(var(--spot), #000 40%, transparent 90%);
+}
+
+/*
   PCT map section highlight (PctMap.astro, driven by the photo strip in Pct.astro).
   The overlay shows only the part of the route from --sec-from to --sec-from + --sec-len (both 0–1 of the
   route's pathLength) in --sec-color. Registering --sec-len as a number lets it animate, so a selected

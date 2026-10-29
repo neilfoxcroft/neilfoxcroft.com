@@ -16,11 +16,15 @@ import Footer from '../components/Footer.astro';
   >
     Skip to content
   </a>
-  {/* Cursor spotlight: a faint accent glow that follows the mouse. Hidden until the mouse moves. */}
+  {/*
+    Cursor spotlight: a faint accent glow that follows the mouse (see .spotlight in global.css). Hidden until the
+    mouse moves. It sits above the page (it can't be clicked) so the sticky section labels' backgrounds below
+    1024px don't cut a dark block out of it.
+  */}
   <div
     aria-hidden="true"
     data-spotlight
-    class="pointer-events-none fixed inset-0 opacity-0 transition-opacity duration-500 [--mx:50vw] [--my:50vh] [background:radial-gradient(560px_circle_at_var(--mx)_var(--my),rgb(203_166_247/0.07),transparent_80%)]"
+    class="spotlight pointer-events-none fixed inset-0 z-30 opacity-0 transition-opacity duration-500 [--mx:50vw] [--my:50vh]"
   >
   </div>
   <div

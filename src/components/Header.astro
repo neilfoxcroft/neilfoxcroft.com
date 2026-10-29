@@ -6,11 +6,13 @@ const { basics } = resume;
 const github = basics.profiles.find((p) => p.network === 'GitHub')!;
 const linkedin = basics.profiles.find((p) => p.network === 'LinkedIn')!;
 
+// Each link's marker is a little mountain ridge (64 × 12, its own skyline per link). Half of it shows at rest and
+// the whole ridge on hover or when its section is in view.
 const nav = [
-  { id: 'about', label: 'About' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'pct', label: 'The PCT' },
+  { id: 'about', label: 'About', ridge: 'M0 10L6 9L10 6L14 8L19 3L23 7L28 5L33 9L38 7L44 4L49 8L54 6L59 9L64 8' },
+  { id: 'experience', label: 'Experience', ridge: 'M0 9L5 8L9 9L14 5L18 6L22 2L27 7L31 6L36 8L41 5L46 7L52 3L57 7L64 9' },
+  { id: 'projects', label: 'Projects', ridge: 'M0 10L7 7L11 8L16 4L21 6L25 5L30 9L35 6L40 7L45 3L50 5L55 8L60 6L64 9' },
+  { id: 'pct', label: 'The PCT', ridge: 'M0 9L4 8L9 4L13 6L17 1L21 5L26 3L31 7L36 6L41 8L46 4L51 6L56 5L64 9' },
 ];
 
 // 44px square tap target around a 22px icon.
@@ -41,8 +43,12 @@ const iconLink = 'inline-flex size-[44px] items-center justify-center rounded-md
             >
               <span
                 aria-hidden="true"
-                class="h-px w-8 bg-current transition-all duration-200 group-hover:w-16 group-aria-[current=true]:w-16 group-aria-[current=true]:bg-accent motion-reduce:transition-none"
-              />
+                class="flex h-3 w-8 overflow-hidden transition-all duration-200 group-hover:w-16 group-aria-[current=true]:w-16 group-aria-[current=true]:text-accent motion-reduce:transition-none"
+              >
+                <svg width="64" height="12" viewBox="0 0 64 12" class="shrink-0">
+                  <path d={n.ridge} fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" />
+                </svg>
+              </span>
               <span>{n.label}</span>
             </a>
           </li>

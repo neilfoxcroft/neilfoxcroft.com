@@ -31,7 +31,7 @@ Replace the 2020 Create React App site (React 16, Bootstrap 4, class components)
 - Section labels are small mono comments: `// about`, `// experience`, etc. That and the font are the only "developer" flavour. Neil explicitly does **not** want a full IDE/terminal skin.
 - Extra accent colour (added 2026-10-29, Neil asked for a bit more colour): the `//` of each section label, the active nav line, the PCT stat numbers and the ↗ arrows on the résumé and journal links are mauve, on top of the existing role title, tags and hover states. Keep it to small touches like these.
 - Tech tags: small rounded pills, accent text on accent at 12% opacity.
-- Motion is minimal: a subtle cursor-following radial spotlight (accent at ~7% opacity, ~560px radius), row hover highlight, the experience scroll timeline, the PCT trail colour-in, and (added 2026-10-29) a hover tilt on the PCT map: the map leans up to ~6° towards the cursor and eases back on leave. The spotlight and hover tilt only run with a mouse/trackpad (`hover: hover` and `pointer: fine`). Respect `prefers-reduced-motion`: no spotlight or hover tilt, and the timeline is shown complete.
+- Motion is minimal: a subtle cursor-following radial spotlight (made larger and softer 2026-10-29 because Chrome showed rings: ~900px radius, accent at ~5% fading on an eased curve, plus a faint grain inside the glow to hide banding; it sits above the page, unclickable, so the sticky section labels below 1024px no longer cut a dark block out of it), row hover highlight, the experience scroll timeline, the PCT trail colour-in, and (added 2026-10-29) a hover tilt on the PCT map: the map leans up to ~6° towards the cursor and eases back on leave. The spotlight and hover tilt only run with a mouse/trackpad (`hover: hover` and `pointer: fine`). Respect `prefers-reduced-motion`: no spotlight or hover tilt, and the timeline is shown complete.
 
 ## Layout (inspired by brittanychiang.com: Neil's favourite reference)
 
@@ -41,7 +41,7 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
 - Name "Neil Foxcroft", title "Backend Software Engineer"
 - One-line pitch: "I build the Java and Kotlin services that connect banks, retailers and their partners, and keep them running in production."
 - "Pretoria, ZA · open to relocation"
-- Section nav: About / Experience / Projects / The PCT. Each item has a horizontal line that lengthens and brightens for the active section (scroll-spy).
+- Section nav: About / Experience / Projects / The PCT. Each item has a horizontal line that lengthens and brightens for the active section (scroll-spy). **Changed 2026-10-29 (Neil):** the lines are now little mountain ridges (elevation-style, a different made-up skyline per item, not the real PCT); half the ridge shows at rest and the whole ridge, in mauve, for the active section or on hover.
 - Icons: GitHub (github.com/neilfoxcroft), LinkedIn (linkedin.com/in/neilfoxcroft, corrected 2026-10-29), email (neilfoxcroftpro@gmail.com), and a résumé PDF link.
 
 **Right column (scrolls):**
