@@ -25,7 +25,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 ## Already pending
 
 - [x] New résumé PDF: the Reactive Resume export is now `public/files/NeilFoxcroftResume.pdf` (2026-10-29).
-- [ ] Restyle the CV to match the site (Neil plans to do this in Reactive Resume). While at it: page 2 holds only the language levels, and the PDF includes a phone number and photo, which will be public once deployed. Decide whether to keep them.
+- [x] Updated CV (2026-10-29): one page, no photo, new layout. Neil is fine with the phone number being public. A restyle to match the site colours is still optional.
 - [x] Shoprite Financial Services URL: links to the Shoprite Holdings financial services page (2026-10-29).
 - [ ] Check the site with reduced motion on (Windows: Settings → Accessibility → Visual effects → Animation effects off).
 - [ ] Step 6, deploy: confirm the S3 bucket / CloudFront setup, set `404.html` as the error page, and ship the `redesign` branch. The site now has a second page, `/trail-stats/` (built as `trail-stats/index.html`): with CloudFront in front of a private S3 bucket, folder URLs need a small CloudFront Function that adds `index.html` (the S3 website endpoint does this by itself).
