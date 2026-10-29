@@ -92,14 +92,30 @@ import { dateRange } from '../lib/format';
   <div class="mt-6">
     <SectionLabel text="certifications" sticky={false} />
   </div>
+  {/* Each certification card links to its verification page (Credly / Microsoft Learn). */}
   <ul class="grid gap-4 sm:grid-cols-2">
     {
       resume.certificates.map((c) => (
-        <li class="rounded-[10px] border border-line px-5 py-4">
-          <h3 class="m-0 text-[0.95rem] font-semibold text-heading">{c.name}</h3>
-          <p class="m-0 mt-1 text-[0.8rem] text-muted">
-            {c.issuer} · {c.date}
-          </p>
+        <li class="flex">
+          <a
+            href={c.url}
+            target="_blank"
+            rel="noopener"
+            class="group flex w-full flex-col gap-1 rounded-[10px] border border-line px-5 py-4 transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
+          >
+            <span class="flex items-start justify-between gap-4">
+              <span class="text-[0.95rem] font-semibold text-heading transition-colors group-hover:text-accent">
+                {c.name}
+              </span>
+              <span aria-hidden="true" class="text-accent">
+                ↗
+              </span>
+            </span>
+            <span class="mt-auto text-[0.8rem] text-muted">
+              {c.issuer} · {c.date}
+            </span>
+            <span class="sr-only">(verify credential, opens in a new tab)</span>
+          </a>
         </li>
       ))
     }

@@ -32,6 +32,7 @@
           "name": "Shoprite Financial Services",
           "type": "Client",
           "description": "Money Market value-added services",
+          "url": "https://www.shopriteholdings.co.za/group/brands/financial-services-customer-rewards.html",
           "startDate": "2024",
           "endDate": "2026",
           "summary": "Built Kotlin and Spring Boot services for electricity, airtime, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, and owned the Namibia and Botswana electricity integrations end to end.",
@@ -84,8 +85,18 @@
     }
   ],
   "certificates": [
-    { "name": "AWS Certified Cloud Practitioner", "issuer": "Amazon Web Services", "date": "2022" },
-    { "name": "Azure Cosmos DB Developer Specialty", "issuer": "Microsoft", "date": "2025" }
+    {
+      "name": "AWS Certified Cloud Practitioner",
+      "issuer": "Amazon Web Services",
+      "date": "2022",
+      "url": "https://www.credly.com/badges/81710cf5-d6bb-4713-aeaf-9b9ba33950d9"
+    },
+    {
+      "name": "Azure Cosmos DB Developer Specialty",
+      "issuer": "Microsoft",
+      "date": "2025",
+      "url": "https://learn.microsoft.com/api/credentials/share/en-us/NeilFoxcroft-0087/CF6074E0DAA1EE3F?sharingId=2E038FCE2265453F"
+    }
   ],
   "projects": [
     {
