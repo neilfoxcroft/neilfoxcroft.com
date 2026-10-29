@@ -20,7 +20,7 @@ const TRAIL_STATES = ['06', '41', '53']; // California, Oregon, Washington
 const CONTEXT_STATES = ['32', '16', '04', '49', '30', '56']; // NV, ID, AZ, UT, MT, WY
 const CONTEXT_COUNTRIES = ['124', '484']; // Canada, Mexico
 
-type Labelled = { text: string; x: number; y: number };
+type Labelled = { text: string; x: number; y: number; size?: number };
 
 export function buildPctMap() {
   const trailFeature = trail as unknown as Feature<LineString>;
@@ -55,34 +55,35 @@ export function buildPctMap() {
   const pick = (fc: FeatureCollection, ids: string[]) =>
     fc.features.filter((f) => ids.includes(String(f.id))).map((f) => path(f) ?? '');
 
-  const at = (text: string, lon: number, lat: number): Labelled => {
+  const at = (text: string, lon: number, lat: number, size?: number): Labelled => {
     const [x, y] = projection([lon, lat])!;
-    return { text, x: Math.round(x), y: Math.round(y) };
+    return { text, x: Math.round(x), y: Math.round(y), size };
   };
 
   const coords = trailFeature.geometry.coordinates as [number, number][];
   const [startX, startY] = projection(coords[0])!;
   const [endX, endY] = projection(coords.at(-1)!)!;
 
-  // Hover segments: the route cut into ~HOVER_SEGMENTS pieces of equal on-map length. Each piece knows
-  // how far along the trail it ends (0 to 1), so hovering it can colour the route from Campo up to there.
-  const HOVER_SEGMENTS = 120;
+  // Hover samples: SAMPLES points spaced evenly along the route as drawn on the map, as a flat
+  // [x0, y0, x1, y1, ...] list in SVG units. Sample i sits i / (SAMPLES - 1) of the way along, which is the
+  // same 0-to-1 scale as the route's pathLength, so the nearest sample to the cursor says how much to colour.
+  const SAMPLES = 400;
   const screen = coords.map((c) => projection(c)!);
   const cumulative = [0];
   for (let i = 1; i < screen.length; i++) {
     cumulative.push(cumulative[i - 1] + Math.hypot(screen[i][0] - screen[i - 1][0], screen[i][1] - screen[i - 1][1]));
   }
   const total = cumulative.at(-1)!;
-  const segments: { d: string; f: number }[] = [];
-  let from = 0;
-  for (let n = 1; n <= HOVER_SEGMENTS; n++) {
-    const target = (total * n) / HOVER_SEGMENTS;
-    let to = from + 1;
-    while (to < coords.length - 1 && cumulative[to] < target) to++;
-    const d = path({ type: 'LineString', coordinates: coords.slice(from, to + 1) });
-    if (d) segments.push({ d, f: +(cumulative[to] / total).toFixed(4) });
-    from = to;
-    if (from >= coords.length - 1) break;
+  const samples: number[] = [];
+  let seg = 1;
+  for (let n = 0; n < SAMPLES; n++) {
+    const target = (total * n) / (SAMPLES - 1);
+    while (seg < screen.length - 1 && cumulative[seg] < target) seg++;
+    const span = cumulative[seg] - cumulative[seg - 1] || 1;
+    const t = Math.min(1, Math.max(0, (target - cumulative[seg - 1]) / span));
+    const [ax, ay] = screen[seg - 1];
+    const [bx, by] = screen[seg];
+    samples.push(+(ax + (bx - ax) * t).toFixed(1), +(ay + (by - ay) * t).toFixed(1));
   }
 
   return {
@@ -91,11 +92,14 @@ export function buildPctMap() {
     contextStates: pick(states, CONTEXT_STATES),
     trailStates: pick(states, TRAIL_STATES),
     trail: path(trailFeature) ?? '',
-    segments,
+    samples,
     start: { x: Math.round(startX), y: Math.round(startY) },
     end: { x: Math.round(endX), y: Math.round(endY) },
-    stateLabels: [at('WASHINGTON', -118.8, 47.3), at('OREGON', -119.9, 43.9), at('CALIFORNIA', -122.0, 37.9)],
-    countryLabels: [at('CANADA', -116.6, 49.6), at('MEXICO', -114.6, 31.3)],
+    // Placed (by searching the map) so the enlarged labels never touch the trail; WASHINGTON and CALIFORNIA
+    // overhang their state a little because the trail leaves no wide enough gap inside them.
+    stateLabels: [at('WASHINGTON', -118.3, 46.93), at('OREGON', -118.59, 43.68), at('CALIFORNIA', -115.91, 34.66)],
+    // The map tilts away from the viewer, so CANADA (far edge) is larger than MEXICO (near edge) to read the same.
+    countryLabels: [at('CANADA', -116.6, 49.53, 34), at('MEXICO', -114.59, 31.35, 30)],
     ocean: at('PACIFIC OCEAN', -126.6, 39),
     attribution: (trail as { properties: { attribution: string } }).properties.attribution,
   };

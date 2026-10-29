@@ -9,9 +9,11 @@ const map = buildPctMap();
   The map is an SVG laid on a tilted plane: CSS perspective on the wrapper, then rotateX/rotateZ on the
   plane, with a darker slab pushed 18px behind it for depth. The tilt is gentler on phones.
   The negative margins take back the empty space the tilt leaves above and below.
-  The route is drawn white. Moving the mouse along it (or tapping it) colours it blue from Campo up to that
-  point: invisible wide "hit" strips sit on top of the route, each with data-f (how far along the trail it ends,
-  0 to 1), and the script copies that into --done, which sets the blue line's dash offset.
+  The route is drawn white. Moving the mouse anywhere over the map (or tapping it) colours it PCT teal from
+  Campo up to the point on the trail nearest the cursor, and it stays coloured after the mouse leaves.
+  data-samples holds evenly spaced points along the route; the script finds the nearest one and sets --done
+  (0 to 1), which drives the coloured line's dash offset. Everything inside the SVG ignores the pointer, so the
+  SVG itself gets every event and offsetX/offsetY are already mapped back through the 3D tilt by the browser.
 */}
 <div class="flex min-w-0 flex-col items-center gap-2">
   <div id="pct-map" data-pct-map class="flex w-full justify-center perspective-[1600px]">
@@ -28,7 +30,8 @@ const map = buildPctMap();
         role="img"
         aria-labelledby="pct-map-title"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        class="relative block h-auto w-full rounded-[18px] border border-line bg-mantle"
+        data-samples={JSON.stringify(map.samples)}
+        class="relative block h-auto w-full cursor-crosshair rounded-[18px] border border-line bg-mantle [&_*]:pointer-events-none"
       >
         <title id="pct-map-title">
           Map of the Pacific Crest Trail, running about 4,200 km from the Mexican border at Campo, California, north
@@ -53,14 +56,14 @@ const map = buildPctMap();
         <g font-family="JetBrains Mono Variable, monospace" font-weight="600" text-anchor="middle" pointer-events="none">
           {
             map.stateLabels.map((l) => (
-              <text x={l.x} y={l.y} font-size="17" letter-spacing="2" fill="#bac2de">
+              <text x={l.x} y={l.y} font-size="22" letter-spacing="1.5" fill="#bac2de">
                 {l.text}
               </text>
             ))
           }
           {
             map.countryLabels.map((l) => (
-              <text x={l.x} y={l.y} font-size="26" letter-spacing="3" fill="#a6adc8">
+              <text x={l.x} y={l.y} font-size={l.size} letter-spacing="3" fill="#a6adc8">
                 {l.text}
               </text>
             ))
@@ -68,7 +71,7 @@ const map = buildPctMap();
           <text
             x={map.ocean.x}
             y={map.ocean.y}
-            font-size="17"
+            font-size="22"
             letter-spacing="3"
             fill="#7f849c"
             transform={`rotate(-90 ${map.ocean.x} ${map.ocean.y})`}
@@ -97,18 +100,11 @@ const map = buildPctMap();
             ></path>
           </g>
         </g>
-        <g aria-hidden="true" fill="none" stroke="transparent" stroke-width="28" stroke-linecap="round" pointer-events="stroke">
-          {map.segments.map((seg) => <path d={seg.d} data-f={seg.f} class="cursor-crosshair" />)}
-        </g>
 
         <circle cx={map.start.x} cy={map.start.y} r="8" fill="#1e1e2e" stroke="#cdd6f4" stroke-width="3" pointer-events="none"
         ></circle>
         <circle cx={map.end.x} cy={map.end.y} r="8" fill="#cdd6f4" stroke="#1e1e2e" stroke-width="3" pointer-events="none"
         ></circle>
-        <g font-family="JetBrains Mono Variable, monospace" font-size="15" fill="#cdd6f4" pointer-events="none">
-          <text x={map.start.x + 16} y={map.start.y - 10}>Campo</text>
-          <text x={map.end.x + 16} y={map.end.y + 6}>Manning Park</text>
-        </g>
       </svg>
     </div>
   </div>
@@ -123,28 +119,41 @@ const map = buildPctMap();
   const map = document.querySelector<HTMLElement>('[data-pct-map]');
   const plane = map?.querySelector<HTMLElement>('[data-pct-plane]');
   const done = map?.querySelector<SVGGElement>('[data-pct-done]');
+  const svg = map?.querySelector<SVGSVGElement>('svg[data-samples]');
+  const samples: number[] = JSON.parse(svg?.dataset.samples ?? '[]');
+  const viewBox = svg?.viewBox.baseVal;
 
-  // Colour the route blue from Campo up to the hit strip under the pointer.
+  // Colour the route from Campo up to the trail point nearest the pointer.
   function colourTo(e: PointerEvent) {
-    const f = (e.target as Element).getAttribute?.('data-f');
-    if (f && done) done.style.setProperty('--done', f);
+    if (!svg || !done || !viewBox || samples.length < 4) return;
+    // offsetX/Y are in the SVG's own (untilted) CSS pixels; scale them to viewBox units.
+    const x = (e.offsetX * viewBox.width) / svg.clientWidth;
+    const y = (e.offsetY * viewBox.height) / svg.clientHeight;
+    let best = 0;
+    let bestD = Infinity;
+    for (let i = 0; i < samples.length; i += 2) {
+      const d = (samples[i] - x) ** 2 + (samples[i + 1] - y) ** 2;
+      if (d < bestD) [bestD, best] = [d, i / 2];
+    }
+    done.style.setProperty('--done', (best / (samples.length / 2 - 1)).toFixed(4));
   }
 
-  if (map && plane && done) {
+  if (map && plane && svg) {
+    svg.addEventListener('pointermove', colourTo);
+    // Taps on touch screens colour the route too.
+    svg.addEventListener('pointerdown', colourTo);
+
+    // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
     map.addEventListener('pointermove', (e) => {
-      colourTo(e);
-      // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
       if (!finePointer.matches || reduceMotion.matches) return;
       const box = map.getBoundingClientRect();
       plane.style.setProperty('--hx', (((e.clientX - box.left) / box.width) * 2 - 1).toFixed(3));
       plane.style.setProperty('--hy', (((e.clientY - box.top) / box.height) * 2 - 1).toFixed(3));
     });
-    // Taps on touch screens colour the route too; it stays until the next tap.
-    map.addEventListener('pointerdown', colourTo);
-    map.addEventListener('pointerleave', (e) => {
+    // Leaving the map levels the tilt; the coloured trail stays where it was.
+    map.addEventListener('pointerleave', () => {
       plane.style.setProperty('--hx', '0');
       plane.style.setProperty('--hy', '0');
-      if (e.pointerType === 'mouse') done.style.setProperty('--done', '0');
     });
   }
 </script>
