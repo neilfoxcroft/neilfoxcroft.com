@@ -36,19 +36,28 @@ const photos = pct.photos.map((ph, i) => {
     from: i === lastIndex ? 0 : (ends[i - 1] ?? 0),
     to: ends[i],
     // The same slice on the elevation profile, and the stretch this photo stands for in the "on screen" band
-    // (Start and End are the two terminuses).
+    // (Start and End are the two terminuses). The last section before End fills through to Manning Park: the
+    // few kilometres past the Northern Terminus would otherwise show as an uncoloured sliver at the edge.
     pFrom: i === lastIndex ? 0 : (profileEnds[i - 1] ?? 0),
-    pTo: profileEnds[i],
+    pTo: i === lastIndex - 1 ? 1 : profileEnds[i],
     wFrom: i === lastIndex ? profileEnds[i - 1] : (profileEnds[i - 1] ?? 0),
     wTo: profileEnds[i],
     colour: sectionColours[i % sectionColours.length],
-    route: prev ? `${prev.endsAt.place} → ${ph.endsAt.place}` : `Southern Terminus, ${ph.endsAt.place}`,
+    // Start and End are single points (a terminus), so they show just the place; sections show from → to.
+    route: prev && ph.miles.length > 1 ? `${prev.endsAt.place} → ${ph.endsAt.place}` : ph.endsAt.place,
     // Section distance in both units; the km/mi switch decides which is shown.
     dist: { metric: distanceRange(ph.miles, 'metric'), imperial: distanceRange(ph.miles, 'imperial') },
   };
 });
 // Section boundaries drawn as faint ticks on the profile (between the sections, not at the two ends).
 const profileTicks = profileEnds.slice(1, -2);
+
+// From desktop width up, the stats read largest number to smallest; phones keep the resume.json order.
+type Stat = (typeof pct.stats)[number];
+const statNumber = (s: Stat) => ('miles' in s && s.miles ? s.miles : Number('value' in s ? s.value : 0));
+const statRank = [...pct.stats].sort((a, b) => statNumber(b) - statNumber(a));
+const orderClasses = ['lg:order-1', 'lg:order-2', 'lg:order-3', 'lg:order-4'];
+const desktopOrder = (s: Stat) => orderClasses[statRank.indexOf(s)];
 ---
 
 <section id="pct" aria-label="Pacific Crest Trail" class="flex scroll-mt-24 flex-col gap-6">
@@ -84,7 +93,7 @@ const profileTicks = profileEnds.slice(1, -2);
         data-elev={JSON.stringify(profile.elev)}
         data-mapf={JSON.stringify(profile.mapF)}
         role="img"
-        aria-label={`Elevation profile of the trail, from Campo to Manning Park. Highest point Mount Whitney, 4,421 metres (14,505 feet).`}
+        aria-label={`Elevation profile of the trail, from the Southern Terminus to the Northern Terminus. Highest point Mount Whitney, 4,421 metres (14,505 feet).`}
         class="relative h-14 cursor-crosshair touch-none select-none"
       >
         <div data-profile-window class="absolute inset-y-0 hidden rounded-sm bg-heading/10 md:hidden!"></div>
@@ -148,8 +157,8 @@ const profileTicks = profileEnds.slice(1, -2);
         </div>
       </div>
       <div aria-hidden="true" class="flex justify-between text-[0.75rem] text-muted">
-        <span>Campo</span>
-        <span>Manning Park</span>
+        <span>Southern Terminus</span>
+        <span>Northern Terminus</span>
       </div>
     </div>
 
@@ -299,7 +308,7 @@ const profileTicks = profileEnds.slice(1, -2);
     </div>
 
     {/*
-      Readout: "// Desert · km 0–1,130 · Campo → Kennedy Meadows" on one line on wider screens; on phones the
+      Readout: "// Desert · km 0–1,130 · Southern Terminus → Kennedy Meadows" on one line on wider screens; on phones the
       route goes on a second line so nothing wraps mid-phrase. Two lines are always reserved on phones so the
       page doesn't jump.
     */}
@@ -321,7 +330,7 @@ const profileTicks = profileEnds.slice(1, -2);
     <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
       {
         pct.stats.map((s) => (
-          <div class="flex flex-col-reverse">
+          <div class:list={['flex flex-col-reverse', desktopOrder(s)]}>
             <dt class="text-[0.8rem] text-muted">{s.label}</dt>
             <dd class="m-0 text-[1.6rem] leading-tight font-bold whitespace-nowrap text-accent">
               {'miles' in s && s.miles ? (
