@@ -30,7 +30,7 @@ Replace the 2020 Create React App site (React 16, Bootstrap 4, class components)
 - Font: JetBrains Mono everywhere, base size 15px, line-height 1.7.
 - Section labels are small mono comments: `// about`, `// experience`, etc. That and the font are the only "developer" flavour. Neil explicitly does **not** want a full IDE/terminal skin.
 - Extra accent colour (added 2026-10-29, Neil asked for a bit more colour): the `//` of each section label, the active nav line, the PCT stat numbers and the ↗ / → arrows on the résumé and trail stats links are mauve, on top of the existing role title, tags and hover states. Keep it to small touches like these.
-- **Link and button labels are all lower case (design choice, Neil, 2026-10-29; applies going forward):** e.g. `more trail stats →`, `← back to neilfoxcroft.com`. Headings and names keep normal capitals. Older labels still capitalised: "View full résumé" and the 404 page's "Back to neilfoxcroft.com".
+- **Link and button labels are all lower case (design choice, Neil, 2026-10-29; applies going forward):** e.g. `more trail stats →`, `← back to neilfoxcroft.com`. Headings and names keep normal capitals. "view full résumé" and the 404 page's "back to neilfoxcroft.com" were lower-cased to match the same day.
 - Tech tags: small rounded pills, accent text on accent at 12% opacity.
 - Motion is minimal: a subtle cursor-following radial spotlight (made larger and softer 2026-10-29 because Chrome showed rings: ~900px radius, accent at ~5% fading on an eased curve, plus a faint grain inside the glow to hide banding; it sits above the page, unclickable, so the sticky section labels below 1024px no longer cut a dark block out of it), row hover highlight, the experience scroll timeline, the PCT trail colour-in, and (added 2026-10-29) a hover tilt on the PCT map: the map leans up to ~6° towards the cursor and eases back on leave. The spotlight and hover tilt only run with a mouse/trackpad (`hover: hover` and `pointer: fine`). Respect `prefers-reduced-motion`: no spotlight or hover tilt, and the timeline is shown complete.
 
@@ -56,7 +56,7 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
      - Entelect Challenge · 2022 — 2026 (the Challenge stopped in 2026; updated 2026-10-29) · "Internal · Cloud Squad, part-time"
    - Each entry has a blurb and tech pills (in the mockup).
    - **Scroll timeline**: a 3px vertical track (`#313244`) left of the entries. A gradient fill (mauve → blue → teal) grows with scroll progress through the section, led by a glowing teal dot. Each entry has a dot on the track that lights up once the fill passes it. The fill reaches each point when it crosses 60% of the screen height. With reduced motion on, the timeline is simply shown full with all dots lit.
-   - Link: "View full résumé ↗".
+   - Link: "view full résumé ↗".
 3. **Education**: two separate cards:
    - BSc Honours, Computer Science & IT · North-West University · 2021 · specialised in AI, advanced databases, computer security and information systems engineering · thesis: detecting StyleGAN-generated images with deep learning
    - BSc Information Technology · North-West University · 2017 — 2020
@@ -86,7 +86,7 @@ The site must be properly mobile friendly, not just "doesn't break". Build mobil
 - Works from 360px wide with no horizontal scroll; comfortable side padding (~1.25rem).
 - Below the desktop breakpoint the left column is no longer sticky and stacks above the content. The section nav is hidden on mobile (brittanychiang.com does the same); name, pitch, location and icon links stay at the top.
 - Because the nav is hidden on mobile, each `// section` label sticks to the top of the screen (with a translucent blurred background) while you scroll through that section.
-- Tap targets at least 44×44px (icon links, nav, "View full résumé", "More trail stats").
+- Tap targets at least 44×44px (icon links, nav, "view full résumé", "more trail stats").
 - Hover-only effects must have no hover dependency: the cursor spotlight is disabled on touch / coarse pointers, and row highlights are a nice-to-have, not the only affordance.
 - Experience timeline works the same on mobile (track stays on the left, entries narrow).
 - PCT map: keep the 3D tilt but reduce it on small screens so it stays readable and doesn't overflow; the stats grid drops below the map. Photo slots stack to one or two per row.
