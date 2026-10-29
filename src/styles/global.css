@@ -59,7 +59,7 @@
      them slides to whichever unit is active. Both colour rules live here (not as utility classes) so the
      more specific "active" rule wins. */
   [data-unit-option] {
-    @apply text-muted transition-colors duration-300;
+    @apply text-muted transition-colors duration-400;
   }
   html:not([data-units='imperial']) [data-unit-option='metric'],
   html[data-units='imperial'] [data-unit-option='imperial'] {
