@@ -52,7 +52,7 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
    - Nested entries beneath it, **no role line on each** (the role lives only at the top):
      - Shoprite Financial Services · 2024 — 2026 · "Client · Money Market value-added services"
      - Standard Bank · 2022 — 2024 · "Client · Value Added Services"
-     - Entelect Challenge · 2022 — Now · "Internal · Cloud Squad, part-time"
+     - Entelect Challenge · 2022 — 2026 (the Challenge stopped in 2026; updated 2026-10-29) · "Internal · Cloud Squad, part-time"
    - Each entry has a blurb and tech pills (in the mockup).
    - **Scroll timeline**: a 3px vertical track (`#313244`) left of the entries. A gradient fill (mauve → blue → teal) grows with scroll progress through the section, led by a glowing teal dot. Each entry has a dot on the track that lights up once the fill passes it. The fill reaches each point when it crosses 60% of the screen height. With reduced motion on, the timeline is simply shown full with all dots lit.
    - Link: "View full résumé ↗".

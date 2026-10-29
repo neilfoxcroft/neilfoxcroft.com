@@ -54,7 +54,8 @@
           "description": "Cloud Squad, part-time",
           "url": "https://challenge.entelect.co.za",
           "startDate": "2022",
-          "summary": "Maintain the AWS infrastructure behind the competition platform: game engine, website, player portal, forum and submissions. Led the cloud team for a year, owning deployment pipelines and production support.",
+          "endDate": "2026",
+          "summary": "Maintained the AWS infrastructure behind the competition platform: game engine, website, player portal, forum and submissions. Led the cloud team for a year, owning deployment pipelines and production support.",
           "keywords": ["AWS", "CI/CD", "Infrastructure"]
         }
       ]
