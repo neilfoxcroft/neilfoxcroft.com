@@ -66,6 +66,12 @@ node scripts/fetch-pct-trail.mjs
 
 The script downloads the trail's route relations from the Overpass API (~17 MB), stitches the pieces into one line from Campo to Manning Park, checks its length, simplifies it and saves it.
 
+Between the map and the photo strip there's an **elevation profile** of the whole trail, built from [`src/data/pct-elevation.json`](src/data/pct-elevation.json): 1,000 evenly spaced points with elevations from NASA SRTM (public domain) via [OpenTopoData](https://www.opentopodata.org), lightly smoothed because only the shape matters. It's linked to the map both ways: dragging along the profile traces the map, and moving over the map moves the profile's marker. Selecting a photo fills its stretch of the profile. To refresh the data after the trail line changes:
+
+```bash
+node scripts/fetch-pct-elevation.mjs
+```
+
 ## Deployment
 
 The site is hosted on AWS. CodeBuild runs [`buildspec.yml`](buildspec.yml) (`npm install`, `npm run build`) and publishes the contents of `dist/`, which are served from S3. `dist/404.html` is the error page.

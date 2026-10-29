@@ -36,7 +36,7 @@ const map = buildPctMap();
         aria-labelledby="pct-map-title"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         data-samples={JSON.stringify(map.samples)}
-        class="relative block h-auto w-full cursor-crosshair rounded-[18px] border border-line bg-mantle [&_*]:pointer-events-none"
+        class="relative block h-auto w-full cursor-crosshair touch-none rounded-[18px] border border-line bg-mantle [&_*]:pointer-events-none"
       >
         <title id="pct-map-title">
           Map of the Pacific Crest Trail, running about 4,200 km from the Mexican border at Campo, California, north
@@ -134,7 +134,7 @@ const map = buildPctMap();
       target="_blank"
       rel="noopener"
       class="text-[#8188a1] decoration-line hover:text-accent">{map.attribution}</a
-    >
+    >{' · '}elevation NASA SRTM
   </p>
 </div>
 
@@ -148,7 +148,8 @@ const map = buildPctMap();
   const samples: number[] = JSON.parse(svg?.dataset.samples ?? '[]');
   const viewBox = svg?.viewBox.baseVal;
 
-  // Colour the route from Campo up to the trail point nearest the pointer.
+  // Colour the route from Campo up to the trail point nearest the pointer, and tell the elevation profile
+  // (pct:map-trace, 0–1 along the route) so its marker follows.
   function colourTo(e: PointerEvent) {
     if (!svg || !done || !viewBox || samples.length < 4) return;
     // Only one highlight shows at a time: the photo strip drops an unpinned section, or cancels this event
@@ -163,7 +164,9 @@ const map = buildPctMap();
       const d = (samples[i] - x) ** 2 + (samples[i + 1] - y) ** 2;
       if (d < bestD) [bestD, best] = [d, i / 2];
     }
-    done.style.setProperty('--done', (best / (samples.length / 2 - 1)).toFixed(4));
+    const f = best / (samples.length / 2 - 1);
+    done.style.setProperty('--done', f.toFixed(4));
+    document.dispatchEvent(new CustomEvent('pct:map-trace', { detail: f }));
   }
 
   // Pointer moves can fire several times per frame; only handle the latest one, once per frame.
@@ -180,8 +183,13 @@ const map = buildPctMap();
 
   if (map && plane && svg) {
     svg.addEventListener('pointermove', onMove);
-    // Taps on touch screens colour the route too.
-    svg.addEventListener('pointerdown', colourTo);
+    // Pressing on the map (finger or mouse) counts as clicking elsewhere: it unpins any pinned photo section.
+    // On touch the SVG has touch-action: none, so a finger dragged across the map traces the trail instead
+    // of scrolling the page; swipes that start anywhere else still scroll.
+    svg.addEventListener('pointerdown', (e) => {
+      document.dispatchEvent(new CustomEvent('pct:map-press'));
+      colourTo(e);
+    });
 
     // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
     map.addEventListener('pointermove', (e) => {
@@ -194,6 +202,7 @@ const map = buildPctMap();
     map.addEventListener('pointerleave', () => {
       plane.style.setProperty('--hx', '0');
       plane.style.setProperty('--hy', '0');
+      document.dispatchEvent(new CustomEvent('pct:map-leave'));
     });
   }
 </script>
