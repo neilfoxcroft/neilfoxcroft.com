@@ -6,8 +6,9 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 
 - [ ] **Education detail panes**: flesh out the text shown when an education card is clicked (`education[].summary`, plus optional `activities`).
   - [x] BSc Information Technology: RAG Technical Committee and residence activities (2026-10-29).
-  - [ ] BSc Honours could say more than the current one-liner (thesis, modules, highlights).
+  - [x] BSc Honours: specialisations and the StyleGAN detection project (2026-10-29).
 - [ ] **Homelab write-up** project: replace the `[Homelab write-up]` placeholder in `projects` (the self-hosted stack, the hardware, how it's deployed and managed).
+- [ ] **StyleGAN detection project** (Neil's Honours project) as its own entry in `projects`: repos github.com/neilfoxcroft/StyleGAN-Identification and StyleGAN_identification_WebAPP. Neil will add it.
 - [ ] **Public backend project**: replace the `[Public backend project]` placeholder in `projects` (a small Spring Boot or Kotlin service with Terraform).
 - [ ] **PCT extras** in `pct`:
   - [x] days on trail (164: 14 Apr – 24 Sep 2026) and pairs of shoes (4), added 2026-10-29
