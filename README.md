@@ -1,6 +1,6 @@
 # neilfoxcroft.com
 
-Source for [neilfoxcroft.com](https://neilfoxcroft.com), the personal site of Neil Foxcroft, a backend software engineer working with Java, Kotlin and Spring Boot.
+Source for [neilfoxcroft.com](https://neilfoxcroft.com), the personal site of Neil Foxcroft, a software engineer working with Java, Kotlin and Spring Boot.
 
 It's a single static page: about, experience, education, projects, and an interactive map of my Pacific Crest Trail thru-hike.
 

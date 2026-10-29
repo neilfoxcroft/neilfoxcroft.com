@@ -60,7 +60,8 @@ const wrap = (text, max) => {
   return lines;
 };
 const mono = `'JetBrains Mono', Consolas, 'DejaVu Sans Mono', monospace`;
-const pitchLines = wrap(pitch, 52)
+// The pitch marks coloured phrases with **…** for the site header; the share image shows it plain.
+const pitchLines = wrap(pitch.replace(/\*\*/g, ''), 52)
   .map((l, i) => `<text x="96" y="${392 + i * 44}" font-size="30" fill="${c.text}">${esc(l)}</text>`)
   .join('\n  ');
 const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="${mono}">

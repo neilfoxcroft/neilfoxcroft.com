@@ -28,6 +28,15 @@ export function elevation(metres: number, units: Units): string {
   return units === 'metric' ? `${num(metres)} m` : `${num(metres * 3.28084)} ft`;
 }
 
+/** Escapes text and colours each **phrase**, taking the colour classes in turn. Used for the header pitch. */
+export function highlight(text: string, colours: string[]): string {
+  let i = 0;
+  return escapeHtml(text).replace(
+    /\*\*(.+?)\*\*/g,
+    (_, phrase: string) => `<span class="font-semibold ${colours[i++ % colours.length]}">${phrase}</span>`,
+  );
+}
+
 /** Escapes text and turns **name** into an emphasised span. Used for the About copy. */
 export function emphasise(text: string): string {
   return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<span class="font-semibold text-heading">$1</span>');
