@@ -72,7 +72,7 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
    - **Layout change from the mockup:** the map sits above the stats rather than beside them. Tilted, the map is ~1.5× its own width on screen, and side by side it overlapped the stats in the 610px column. Stats are a 4-across row (2×2 on phones).
    - On phones the tilt is gentler (`rotateX(35deg) rotateZ(-8deg)`, 80% width) so it fits 360px screens without sideways scroll.
    - Stats grid: 4,265 km trail length · 3 states · [days on trail] · [pairs of shoes]. Plus "[Read the trail journal]", and three photo slots (desert, Sierra, Cascades). The bracketed items are placeholders for Neil.
-6. **Footer**: "Built by Neil with [stack], deployed on AWS. Source on GitHub. Colours from Catppuccin Mocha."
+6. **Footer**: "Built by Neil with [stack], deployed on AWS. Source on GitHub. Colours from Catppuccin Mocha." **Updated 2026-10-29:** also credits the layout inspiration: "Layout inspired by Brittany Chiang" (linked to brittanychiang.com), and Neil chose a light Claude mention: "Built by Neil, with help from Claude, using Astro and Tailwind CSS…".
 
 ## Mobile (required, added 2026-10-29)
 
