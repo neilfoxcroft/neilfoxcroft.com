@@ -2,22 +2,71 @@
 import SectionLabel from './SectionLabel.astro';
 import resume from '../data/resume.json';
 import { dateRange } from '../lib/format';
-
-const card = 'flex flex-col gap-1.5 rounded-[10px] border border-line p-5';
 ---
 
 <section id="education" aria-label="Education and certifications" class="flex flex-col gap-4">
   <SectionLabel text="education" />
-  <ul class="grid gap-4 sm:grid-cols-2">
+  {/*
+    Cards sit in an equal-row grid (auto-rows-fr), so they are always the same height, side by side or stacked. Clicking a card opens a
+    native <dialog> with the details; every dialog is the same size. Esc, the close button or a click
+    outside closes it.
+  */}
+  <ul class="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
     {
-      resume.education.map((ed) => (
-        <li class={card}>
-          <p class="m-0 text-[0.8rem] text-muted">{dateRange(ed.startDate, ed.endDate)}</p>
-          <h3 class="m-0 text-[1rem] font-semibold text-heading">
-            {ed.studyType}, {ed.area}
-          </h3>
-          <p class="m-0 text-[0.8rem] text-muted">{ed.institution}</p>
-          {ed.summary && <p class="m-0 mt-1 text-[0.9rem]">{ed.summary}</p>}
+      resume.education.map((ed, i) => (
+        <li class="flex">
+          <button
+            type="button"
+            data-edu-open={i}
+            aria-haspopup="dialog"
+            class="group flex w-full cursor-pointer flex-col gap-1.5 rounded-[10px] border border-line p-5 text-left transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
+          >
+            <span class="flex items-start justify-between gap-4">
+              <span class="text-[0.8rem] text-muted">{dateRange(ed.startDate, ed.endDate)}</span>
+              <span
+                aria-hidden="true"
+                class="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent transition-colors group-hover:bg-accent/25"
+              >
+                +
+              </span>
+            </span>
+            <span class="text-[0.8rem] font-medium text-accent">{ed.studyType}</span>
+            <span class="text-[1rem] font-semibold text-heading transition-colors group-hover:text-accent">
+              {ed.area}
+            </span>
+            {/* mt-auto pins the university to the bottom so it lines up across cards. */}
+            <span class="mt-auto pt-1.5 text-[0.8rem] text-muted">{ed.institution}</span>
+            <span class="sr-only">(show details)</span>
+          </button>
+
+          <dialog
+            data-edu-dialog={i}
+            aria-labelledby={`edu-title-${i}`}
+            class="m-auto h-[min(24rem,calc(100dvh-2rem))] w-[min(34rem,calc(100vw-2rem))] sm:h-[min(20rem,calc(100dvh-2rem))] overflow-y-auto rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/70 backdrop:backdrop-blur-sm"
+          >
+            <div class="flex min-h-full flex-col gap-2 p-6">
+              <div class="flex items-start justify-between gap-4">
+                <p class="m-0 text-[0.8rem] text-muted">
+                  <span class="text-accent">//</span>{" "}
+                  {dateRange(ed.startDate, ed.endDate)}
+                </p>
+                <button
+                  type="button"
+                  data-edu-close
+                  aria-label="Close"
+                  class="-mt-2 -mr-2 flex size-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:text-accent"
+                >
+                  ✕
+                </button>
+              </div>
+              <p class="m-0 text-[0.8rem] font-medium text-accent">{ed.studyType}</p>
+              <h3 id={`edu-title-${i}`} class="m-0 text-[1.15rem] font-semibold text-heading">
+                {ed.area}
+              </h3>
+              <p class="m-0 text-[0.8rem] text-muted">{ed.institution}</p>
+              <p class="m-0 mt-3 text-[0.9rem]">{ed.summary}</p>
+            </div>
+          </dialog>
         </li>
       ))
     }
@@ -39,3 +88,16 @@ const card = 'flex flex-col gap-1.5 rounded-[10px] border border-line p-5';
     }
   </ul>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-edu-open]').forEach((button) => {
+    const dialog = document.querySelector<HTMLDialogElement>(`[data-edu-dialog="${button.dataset.eduOpen}"]`);
+    if (!dialog) return;
+    button.addEventListener('click', () => dialog.showModal());
+    dialog.querySelector('[data-edu-close]')?.addEventListener('click', () => dialog.close());
+    // A click on the backdrop lands on the <dialog> element itself, not its content.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+</script>
