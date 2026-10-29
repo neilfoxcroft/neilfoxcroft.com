@@ -41,7 +41,10 @@ const iconLink = 'inline-flex size-[44px] items-center justify-center rounded-md
         {basics.location.city}, {basics.location.countryCode}
       </span>
       <span aria-hidden="true">·</span>
-      <span><span aria-hidden="true">🌍</span> {basics.location.note}</span>
+      {/* Easter egg: looks like plain text until hovered, and leads to the travel globe (/places/). */}
+      <a href="/places/" class="text-muted no-underline hover:text-accent">
+        <span aria-hidden="true">🌍</span> {basics.location.note}
+      </a>
     </p>
   </div>
 

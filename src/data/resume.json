@@ -121,6 +121,19 @@
       "keywords": ["[tags]"]
     }
   ],
+  "places": {
+    "title": "Places I've been",
+    "intro": "A dark world, lit up wherever I've been. Drag it to spin it.",
+    "countries": [
+      "South Africa",
+      "United Arab Emirates",
+      "Germany",
+      "Lesotho",
+      "Madagascar",
+      "United States of America"
+    ],
+    "usStates": ["California", "Oregon", "Washington", "New York", "Illinois", "Colorado", "Nevada", "Arizona"]
+  },
   "pct": {
     "heading": "Mexico to Canada, on foot",
     "intro": "In 2026 I thru-hiked the Pacific Crest Trail, from the Mexican border to the Canadian border, through the deserts, the Sierra Nevada and the Cascades. [A few lines in your own words: why you did it, a highlight, what it taught you.]",

@@ -1,0 +1,278 @@
+---
+// /places/: an easter egg behind "open to relocation" in the header. A slowly spinning globe: dark land with no
+// borders, and only the countries (and, in the US, the states) listed under `places` in resume.json drawn on it,
+// lit up. Drawn on a canvas in the browser with d3-geo (map data: src/lib/places-globe.ts).
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import resume from '../data/resume.json';
+import { buildPlacesGlobe } from '../lib/places-globe';
+
+const { places } = resume;
+const globe = buildPlacesGlobe();
+const lit = [...globe.countries, ...globe.states];
+---
+
+<Base title="Places I've been — Neil Foxcroft" description="The countries and US states Neil Foxcroft has been to, on a spinning globe.">
+  <main class="mx-auto flex max-w-[880px] flex-col gap-10 px-5 py-14 md:px-12 md:py-24">
+    <a href="/" class="inline-flex min-h-[44px] items-center gap-2 self-start font-semibold">
+      <span aria-hidden="true" class="text-accent">←</span> back to neilfoxcroft.com
+    </a>
+
+    <div class="flex flex-col gap-3">
+      <p class="m-0 text-[0.8rem] text-muted"><span class="text-accent">//</span> places</p>
+      <h1 class="m-0 text-[2.4rem] leading-[1.1] font-bold tracking-tight text-heading sm:text-[2.75rem]">
+        {places.title}
+      </h1>
+      <p class="m-0 max-w-[34rem]">{places.intro}</p>
+    </div>
+
+    <figure class="m-0 flex flex-col items-center gap-4">
+      <canvas
+        data-globe
+        role="img"
+        aria-label={`A globe with the places I've been lit up: ${lit.map((p) => p.name).join(', ')}.`}
+        class="aspect-square w-full max-w-[560px] cursor-grab touch-none active:cursor-grabbing"
+      ></canvas>
+      {/* Name of the lit place under the pointer (or last tapped). */}
+      <p data-globe-readout aria-hidden="true" class="m-0 h-6 text-[0.85rem] text-muted"></p>
+    </figure>
+
+    <div class="flex flex-col gap-6 sm:flex-row sm:gap-16">
+      {
+        globe.countries.length + Number(globe.usa) > 0 && (
+          <div class="flex flex-col gap-2">
+            <h2 class="m-0 text-[0.8rem] font-normal text-muted">
+              <span class="text-accent">//</span> countries
+            </h2>
+            <ul class="m-0 flex list-none flex-col gap-1 p-0">
+              {globe.countries.map((p) => (
+                <li class="flex items-center gap-2.5 text-heading">
+                  <span aria-hidden="true" class="size-2.5 rounded-full" style={`background:${p.colour}`} />
+                  {p.name}
+                </li>
+              ))}
+              {globe.usa && (
+                <li class="flex items-center gap-2.5 text-heading">
+                  <span aria-hidden="true" class="size-2.5 rounded-full border border-muted" />
+                  United States
+                </li>
+              )}
+            </ul>
+          </div>
+        )
+      }
+      {
+        globe.states.length > 0 && (
+          <div class="flex flex-col gap-2">
+            <h2 class="m-0 text-[0.8rem] font-normal text-muted">
+              <span class="text-accent">//</span> us states
+            </h2>
+            <ul class="m-0 flex list-none flex-col gap-1 p-0">
+              {globe.states.map((p) => (
+                <li class="flex items-center gap-2.5 text-heading">
+                  <span aria-hidden="true" class="size-2.5 rounded-full" style={`background:${p.colour}`} />
+                  {p.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </main>
+  <Footer />
+
+  <script is:inline type="application/json" id="globe-data" set:html={JSON.stringify({ lit, land: globe.land })} />
+</Base>
+
+<script>
+  import { geoCentroid, geoContains, geoDistance, geoGraticule10, geoOrthographic, geoPath } from 'd3-geo';
+  import type { GeoPermissibleObjects } from 'd3-geo';
+  import type { Geometry, MultiPolygon, Polygon } from 'geojson';
+  import type { GeometryCollection, Topology } from 'topojson-specification';
+  import { feature } from 'topojson-client';
+
+  type Place = { name: string; colour?: string; geometry: Geometry; centre: [number, number]; reach: number };
+  const data: {
+    lit: { name: string; colour: string; geometry: Polygon | MultiPolygon }[];
+    land: Topology;
+  } = JSON.parse(document.getElementById('globe-data')?.textContent ?? '{}');
+
+  // Each shape's centre and how far (in radians) its furthest point lies from it, so the globe can tell
+  // cheaply which shapes cross its edge (see insideOut below).
+  const place = (name: string, geometry: Polygon | MultiPolygon, colour?: string): Place => {
+    const centre = geoCentroid(geometry);
+    const rings = geometry.type === 'Polygon' ? geometry.coordinates : geometry.coordinates.flat();
+    let reach = 0;
+    for (const ring of rings) for (const p of ring) reach = Math.max(reach, geoDistance(centre, p as [number, number]));
+    return { name, geometry, colour, centre, reach };
+  };
+
+  // The land is one dark outline with no borders, split into its separate landmasses (so only those crossing
+  // the globe's edge need checking); the places I've been are drawn on top of it.
+  const landShape = feature(data.land, data.land.objects.land as GeometryCollection).features[0]
+    .geometry as MultiPolygon;
+  const land = landShape.coordinates.map((polygon) => place('land', { type: 'Polygon', coordinates: polygon }));
+  const litPlaces = data.lit.map((p) => place(p.name, p.geometry, p.colour));
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-globe]');
+  const readout = document.querySelector<HTMLElement>('[data-globe-readout]');
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx) {
+    const projection = geoOrthographic().precision(0.4);
+    const path = geoPath(projection, ctx);
+    // At rare angles d3's clipping at the globe's edge turns a shape inside out, so it would fill the whole
+    // globe for a frame (a bright flash). Only shapes crossing the edge can do that, so just those are
+    // measured, and one covering more than 60% of the disc (no real country does) is skipped for that frame.
+    const measure = geoPath(projection);
+    const insideOut = (p: Place) => {
+      const r = projection.rotate();
+      const fromCentre = geoDistance([-r[0], -r[1]], p.centre);
+      if (Math.abs(fromCentre - Math.PI / 2) > p.reach) return false;
+      return measure.area(p.geometry) > 0.6 * Math.PI * projection.scale() ** 2;
+    };
+    const graticule = geoGraticule10();
+
+    // Start over the Atlantic, tilted a little so more of the northern hemisphere shows.
+    let rotation: [number, number] = [20, -15];
+    let hovered: Place | undefined;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const SPIN = 6; // degrees a second
+
+    const resize = () => {
+      const size = canvas.clientWidth;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      projection.scale(size / 2 - 6).translate([size / 2, size / 2]);
+    };
+
+    const fill = (shape: GeoPermissibleObjects, colour: string) => {
+      ctx.beginPath();
+      path(shape);
+      ctx.fillStyle = colour;
+      ctx.fill();
+    };
+
+    const draw = () => {
+      projection.rotate(rotation);
+      const size = canvas.clientWidth;
+      ctx.clearRect(0, 0, size, size);
+
+      // Ocean, graticule, then the dark land (one path, no borders).
+      fill({ type: 'Sphere' }, '#181825');
+      ctx.beginPath();
+      path(graticule);
+      ctx.strokeStyle = 'rgba(205, 214, 244, 0.06)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+      ctx.beginPath();
+      for (const p of land) if (!insideOut(p)) path(p.geometry);
+      ctx.fillStyle = '#313244';
+      ctx.fill();
+
+      // The places I've been, lit, with a soft glow; the hovered one gets a light outline.
+      for (const p of litPlaces) {
+        if (insideOut(p)) continue;
+        ctx.save();
+        ctx.shadowColor = p.colour!;
+        ctx.shadowBlur = 14;
+        fill(p.geometry, p.colour!);
+        ctx.restore();
+        if (p === hovered) {
+          ctx.strokeStyle = '#cdd6f4';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // Rim of the globe.
+      ctx.beginPath();
+      path({ type: 'Sphere' });
+      ctx.strokeStyle = '#45475a';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    };
+
+    // Which lit place is under a point on the canvas, if any.
+    const placeAt = (x: number, y: number) => {
+      const lonLat = projection.invert?.([x, y]);
+      if (!lonLat || Number.isNaN(lonLat[0])) return undefined;
+      // invert() also answers for points off the edge of the globe, so check the point is on the visible side.
+      const [cx, cy] = projection.translate();
+      if (Math.hypot(x - cx, y - cy) > projection.scale()) return undefined;
+      return litPlaces.find((p) => geoContains(p.geometry, lonLat));
+    };
+    const showName = (p: Place | undefined) => {
+      hovered = p;
+      if (readout) {
+        readout.textContent = p ? `// ${p.name}` : '';
+        readout.style.color = p?.colour ?? '';
+      }
+    };
+
+    // Where the mouse rests over the globe, so the name keeps up as places spin under it.
+    let mouse: [number, number] | undefined;
+
+    // Dragging spins the globe; auto-spin pauses while dragging and for a moment after.
+    let drag: { x: number; y: number; rotation: [number, number]; moved: boolean } | undefined;
+    let resumeAt = 0;
+    canvas.addEventListener('pointerdown', (e) => {
+      canvas.setPointerCapture(e.pointerId);
+      drag = { x: e.clientX, y: e.clientY, rotation: [...rotation], moved: false };
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (drag) {
+        const k = 160 / projection.scale(); // degrees per pixel, so the surface roughly follows the finger
+        const dx = e.clientX - drag.x;
+        const dy = e.clientY - drag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+        rotation = [drag.rotation[0] + dx * k, Math.max(-70, Math.min(70, drag.rotation[1] - dy * k))];
+        if (reduceMotion) requestAnimationFrame(draw);
+      } else if (e.pointerType === 'mouse') {
+        mouse = [e.offsetX, e.offsetY];
+        showName(placeAt(...mouse));
+        if (reduceMotion) requestAnimationFrame(draw);
+      }
+    });
+    const endDrag = (e: PointerEvent) => {
+      // A tap (no drag) names the place under the finger.
+      if (drag && !drag.moved) showName(placeAt(e.offsetX, e.offsetY));
+      drag = undefined;
+      resumeAt = performance.now() + 1500;
+      if (reduceMotion) requestAnimationFrame(draw);
+    };
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      mouse = undefined;
+      if (!drag) showName(undefined);
+    });
+
+    resize();
+    new ResizeObserver(() => {
+      resize();
+      draw();
+    }).observe(canvas);
+
+    if (reduceMotion) {
+      draw();
+    } else {
+      let last = performance.now();
+      const frame = (now: number) => {
+        const dt = Math.min(now - last, 100) / 1000;
+        last = now;
+        if (!drag && now > resumeAt) {
+          rotation = [rotation[0] + SPIN * dt, rotation[1]];
+          projection.rotate(rotation);
+          if (mouse) showName(placeAt(...mouse));
+        }
+        draw();
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    }
+  }
+</script>

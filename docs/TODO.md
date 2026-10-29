@@ -15,6 +15,8 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
   - **trail stats page** (`pct.moreStats` → /trail-stats/, added 2026-10-29): the numbers are in (2026-10-29; steps is a guesstimate Neil may replace); still to write: the Refill story in the soda refills note. Mark guesses with `"guess": true`; add `"note"` for a hover explanation.
   - seven photos, one per section (2026-10-29): Start, Desert, Sierra, NorCal, Oregon, Washington, End. Drop each in `src/assets/pct/` and set `pct.photos[].image` and `alt` in resume.json (see README → PCT photos). Hover-to-map and click-to-enlarge are already built.
 
+- [x] **Places globe** (`/places/`, the easter egg behind "open to relocation", added 2026-10-29): Neil's list is in (2026-10-29). To add more, edit `places.countries` / `places.usStates` in resume.json. Names must match the map data exactly (e.g. "United States of America", "United Kingdom"); the build says which name it doesn't recognise.
+
 ## Features to consider
 
 - [ ] **Get in touch / contact**: a contact section on the page, or its own page. Today there's only the email icon in the header.

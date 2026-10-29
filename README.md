@@ -66,6 +66,8 @@ node scripts/fetch-pct-trail.mjs
 
 The script downloads the trail's route relations from the Overpass API (~17 MB), stitches the pieces into one line from Campo to Manning Park, checks its length, simplifies it and saves it.
 
+Behind "open to relocation" in the header there's an easter egg: **`/places/`**, a spinning globe: dark, borderless land with only the countries and US states listed under `places` in `src/data/resume.json` drawn on it, lit up. Shapes come from [world-atlas](https://github.com/topojson/world-atlas) (Natural Earth) and [us-atlas](https://github.com/topojson/us-atlas) (US Census Bureau), both public domain, picked at build time in `src/lib/places-globe.ts`. Names must match those datasets. Don't round or simplify the shapes to save space: that kinks borders, and kinked shapes can briefly fill the whole globe as it turns (a bright flash).
+
 Between the map and the photo strip there's an **elevation profile** of the whole trail, built from [`src/data/pct-elevation.json`](src/data/pct-elevation.json): 1,000 evenly spaced points with elevations from NASA SRTM (public domain) via [OpenTopoData](https://www.opentopodata.org), lightly smoothed because only the shape matters. It's linked to the map both ways: dragging along the profile traces the map, and moving over the map moves the profile's marker. Selecting a photo fills its stretch of the profile. To refresh the data after the trail line changes:
 
 ```bash
