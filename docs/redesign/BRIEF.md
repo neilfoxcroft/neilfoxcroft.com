@@ -110,6 +110,29 @@ The site must be properly mobile friendly, not just "doesn't break". Build mobil
 - Replace the old résumé at `public/files/NeilFoxcroftResume.pdf` with the current one. **Done 2026-10-29** with Neil's Reactive Resume export; he will restyle it to match the site later.
 - A proper `README.md` for the public repo: what it is, stack, local dev, how content is edited (the data file), deploy.
 
+## Final fixes before launch (Neil, 2026-10-29)
+
+- **Places page:** Namibia added; the intro line and the big heading are gone: the page's heading is just the small label `// places I've been`. From 1024px up the page fits the window with no scrolling (one screen tall, footer at the bottom, globe sized min(560px, 100dvh − 17rem); checked at 1440×900, 1366×768 and 1280×720), with the globe on the left and the countries and US states lists side by side to its right. The hint "drag to spin · double-click to reset" shows under the globe when no place is named. Double-click (or double-tap) eases the globe back to its starting view over 0.9s, then it rests for 1.5s before spinning on.
+- **Education:** the Honours box mentions the tutoring (Computer Networks, CMPG 315, Feb–Jul 2021, from Neil's 2021 CV) with it listed under activities, and ends with a "the StyleGAN project →" link that closes the box and scrolls to the project. Both education boxes are a little taller (35rem) so nothing scrolls.
+- **Projects:** the homelab and public backend placeholders are removed; "Identifying StyleGAN faces" (Honours project · 2021) is first, linking to github.com/neilfoxcroft/StyleGAN-Identification, then BLEGO.
+- **PCT map:** when nobody is hovering it, the map sways gently on its own (a 16s drift of the hover tilt, about ±2°), paused off screen and off with reduced motion.
+- **PCT photos are in (2026-10-29):** Neil's seven photos (pct-1…7.jpg) fill the strip in trail order, each with alt text. The enlarged view now hugs the photo (fit-content width, up to 1200px) so portrait photos have no black bars.
+- **PCT photos:** a click or tap only selects a photo (map and profile colouring); pressing and holding for 0.5s opens it full size, and Enter does too. A "hold ⤢" badge shows on hover (or once selected), and the photo fills up from the bottom in its section colour while held. Moving more than 10px (swiping the strip) cancels.
+- **Light / dark mode:** a subtle switch as the last item on the footer line (`// theme` then a small drawn sun + "light" or moon + "dark"; drawn icons, not ☀/☾ symbols, which sit differently per font), styled like the footer links; both labels are in the markup and CSS shows the right one, so nothing flickers on load; the Claude logo sits on the text baseline so every footer item lines up; the footer is a size smaller (0.72rem) and tighter. Light is Catppuccin Latte, with teal and peach darkened for AA contrast; dark (Mocha) is the default. The choice is saved and applied before paint. The PCT map card and the places globe stay dark in both themes. The footer now credits "Catppuccin" rather than "Catppuccin Mocha".
+- **Trail stats:** numbers a size smaller (1.35rem phones, 1.6rem from 640px), labels 0.8rem, and every row top-aligned so wrapped values no longer leave odd gaps. Burgers is removed; "climbs: too boku" takes its place (Neil's spelling). The soda refills note tells the Refill story. A further row (2026-10-30) before "life-changing moments", which stays alone on the last row: weight loss 30 kg (66 lb, follows the km/mi switch; stored as "kg"), injuries 4, injurknees 1 (Neil's joke, spelt that way). The footnote now reads "The ones marked ≈ are honest guesstimates, because nothing was really being tracked that extensively."
+- **PCT intro:** "In 2026 my fiancée and I thru-hiked the Pacific Crest Trail… It was a dream we had chased for four years: for us it's indescribable, and for anyone else, unimaginable."
+- **Visitor stats:** GoatCounter (cookie-free, no IP addresses stored; dashboard foxcroft.goatcounter.com), one async script in Base.astro, production builds only. CloudFront access logs were the first choice, but the Free plan doesn't include them (paid plans only).
+- **README** rewritten in the first person and brought up to date.
+- **Wording:** checked against Neil's CV; Shoprite now says "airtime and data" and mentions onboarding developers and code review.
+
+## Hosting and deploy (set up 2026-10-29)
+
+- AWS account 433102245367 (CLI profile `personal`, IAM admin user with MFA; never root). CloudFront distribution EAQFNSEB53K0Y (neilfoxcroft.com + www) on the **CloudFront Free flat-rate plan** ($0, no overage charges, blocked traffic doesn't count) with a WAF that blocks: 500 requests / 5 min per IP, plus AWS IP reputation, common rule set and known bad inputs.
+- S3 bucket `neilfoxcroft.com` is private: only CloudFront reads it (Origin Access Control), Block Public Access on, no S3 website hosting.
+- Deploys: push to `master` → CodePipeline `cicd-neilfoxcroft` → CodeBuild (`buildspec.yml`, Node 24) builds, syncs `dist/` to S3 (`_astro/` cached a year, the rest revalidated by browsers and cached a day at CloudFront) and invalidates CloudFront.
+- CloudFront Function `neilfoxcroft-index-rewrite` (infra/) maps folder URLs to their index.html; missing pages get /404.html with status 404.
+- Running cost ≈ $0–0.60/month. Alerts: $1 and $5 budgets plus Cost Anomaly Detection, all to Neil's Gmail. AWS has no hard cap; the flat-rate plan and private bucket are what stop a big bill.
+
 ## Open TODOs
 
 Tracked in `docs/TODO.md` (content Neil will write, possible contact section, deploy, etc.).
