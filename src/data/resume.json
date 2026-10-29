@@ -132,9 +132,12 @@
     ],
     "journal": { "label": "[Read the trail journal]" },
     "photos": [
-      { "label": "[photo · desert]" },
-      { "label": "[photo · Sierra]" },
-      { "label": "[photo · Cascades]" }
+      { "section": "Start", "miles": "mi 0", "endsAt": { "place": "Campo", "lonLat": [-116.467, 32.59] }, "image": null, "alt": "" },
+      { "section": "Desert", "miles": "mi 0–702", "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
+      { "section": "Sierra", "miles": "mi 702–1195", "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": null, "alt": "" },
+      { "section": "NorCal", "miles": "mi 1195–1689", "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": null, "alt": "" },
+      { "section": "Oregon", "miles": "mi 1689–2147", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
+      { "section": "Washington", "miles": "mi 2147–2650", "endsAt": { "place": "Manning Park", "lonLat": [-120.787, 49.063] }, "image": null, "alt": "" }
     ]
   }
 }

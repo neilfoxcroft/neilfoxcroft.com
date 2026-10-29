@@ -86,7 +86,22 @@ export function buildPctMap() {
     samples.push(+(ax + (bx - ax) * t).toFixed(1), +(ay + (by - ay) * t).toFixed(1));
   }
 
+  // A place ([lon, lat]) -> the 0-to-1 position of the nearest trail point along the drawn route (the scale
+  // --done uses). Section ends are pinned to real places rather than converted from trail miles, because the
+  // OSM line doesn't track the official mileage evenly (reroutes, alternates).
+  const fractionAtPlace = ([lon, lat]: [number, number]): number => {
+    const cosLat = Math.cos((lat * Math.PI) / 180);
+    let best = 0;
+    let bestD = Infinity;
+    coords.forEach(([x, y], i) => {
+      const d = ((x - lon) * cosLat) ** 2 + (y - lat) ** 2;
+      if (d < bestD) [bestD, best] = [d, i];
+    });
+    return +(cumulative[best] / total).toFixed(4);
+  };
+
   return {
+    fractionAtPlace,
     graticule: path(geoGraticule().step([2, 2])()) ?? '',
     countries: pick(countries, CONTEXT_COUNTRIES),
     contextStates: pick(states, CONTEXT_STATES),
