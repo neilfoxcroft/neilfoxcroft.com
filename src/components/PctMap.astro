@@ -21,7 +21,7 @@ const map = buildPctMap();
   <div class="z-10 mb-2 self-end md:absolute md:top-0 md:right-0 md:mb-0">
     <UnitToggle />
   </div>
-  <div id="pct-map" data-pct-map class="flex w-full justify-center perspective-[1600px]">
+  <div id="pct-map" data-pct-map class="theme-dark flex w-full justify-center perspective-[1600px]">
     <div
       data-pct-plane
       class="relative w-[80%] max-w-[380px] transform-3d transition-transform duration-300 ease-out [--hx:0] [--hy:0] -mt-[28px] [transform:translateX(-10px)_rotateX(35deg)_rotateZ(-8deg)] motion-reduce:transition-none md:mt-[-84px] md:w-[68%] md:mb-[-24px] md:[transform:translateX(-26px)_rotateY(calc(var(--hx)*6deg))_rotateX(calc(50deg_-_var(--hy)*6deg))_rotateZ(-22deg)]"
@@ -128,12 +128,12 @@ const map = buildPctMap();
       </svg>
     </div>
   </div>
-  <p class="m-0 text-[0.8rem] text-[#8188a1]">
+  <p class="m-0 text-[0.8rem] text-faint">
     trail data <a
       href="https://www.openstreetmap.org/copyright"
       target="_blank"
       rel="noopener"
-      class="text-[#8188a1] decoration-line hover:text-accent">{map.attribution}</a
+      class="text-faint decoration-line hover:text-accent">{map.attribution}</a
     >{' · '}elevation NASA SRTM
   </p>
 </div>
@@ -192,17 +192,22 @@ const map = buildPctMap();
     });
 
     // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
+    // data-hover stops the idle drift (global.css) while the cursor is in charge.
     map.addEventListener('pointermove', (e) => {
       if (!finePointer.matches || reduceMotion.matches) return;
       const box = map.getBoundingClientRect();
+      plane.toggleAttribute('data-hover', true);
       plane.style.setProperty('--hx', (((e.clientX - box.left) / box.width) * 2 - 1).toFixed(3));
       plane.style.setProperty('--hy', (((e.clientY - box.top) / box.height) * 2 - 1).toFixed(3));
     });
-    // Leaving the map levels the tilt; the coloured trail stays where it was.
+    // Leaving the map levels the tilt and hands back to the idle drift; the coloured trail stays where it was.
     map.addEventListener('pointerleave', () => {
+      plane.removeAttribute('data-hover');
       plane.style.setProperty('--hx', '0');
       plane.style.setProperty('--hy', '0');
       document.dispatchEvent(new CustomEvent('pct:map-leave'));
     });
+    // Pause the idle drift while the map is off screen.
+    new IntersectionObserver(([entry]) => plane.toggleAttribute('data-offscreen', !entry.isIntersecting)).observe(map);
   }
 </script>

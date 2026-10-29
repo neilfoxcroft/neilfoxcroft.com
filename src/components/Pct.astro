@@ -72,7 +72,7 @@ const profileTicks = profileEnds.slice(1, -2);---
     Hovering, tapping or focusing a photo selects it: the map lights up just that section of the route in the
     section's colour (filling up from its start to its end), and the readout line below shows its details.
     The selection stays until another photo is selected or you click anywhere else on the page.
-    Clicking a photo opens it full size in a <dialog>.
+    Clicking a photo selects it; pressing and holding it (or Enter) opens it full size in a <dialog>.
     Seven fit in one row on wide screens; on narrower ones the strip scrolls sideways.
   */}
   <div class="flex flex-col gap-2">
@@ -100,8 +100,8 @@ const profileTicks = profileEnds.slice(1, -2);---
           preserveAspectRatio="none"
           class="absolute inset-0 h-full w-full overflow-visible"
         >
-          <path d={profile.area} fill="#313244" opacity="0.7"></path>
-          <path d={profile.line} fill="none" stroke="#6c7086" stroke-width="1.25" vector-effect="non-scaling-stroke"></path>
+          <path d={profile.area} class="fill-line" opacity="0.7"></path>
+          <path d={profile.line} fill="none" class="stroke-chart" stroke-width="1.25" vector-effect="non-scaling-stroke"></path>
           {
             profileTicks.map((t) => (
               <line
@@ -109,7 +109,7 @@ const profileTicks = profileEnds.slice(1, -2);---
                 x2={t * PROFILE_W}
                 y1="0"
                 y2={PROFILE_H}
-                stroke="#45475a"
+                class="stroke-line-strong"
                 stroke-dasharray="2 3"
                 vector-effect="non-scaling-stroke"
               />
@@ -193,16 +193,29 @@ const profileTicks = profileEnds.slice(1, -2);---
                   type="button"
                   data-photo-open={i}
                   aria-haspopup="dialog"
-                  aria-label={`Enlarge photo: ${ph.section}`}
-                  class="block cursor-zoom-in overflow-hidden rounded-lg border border-line transition-colors group-hover:border-(--c) group-data-active:border-(--c)"
+                  aria-label={`${ph.section}: press and hold (or Enter) to enlarge`}
+                  class="relative block w-full touch-pan-x overflow-hidden rounded-lg border border-line transition-colors select-none [-webkit-touch-callout:none] group-hover:border-(--c) group-data-active:border-(--c)"
                 >
                   <Image
                     src={ph.src}
                     alt={ph.alt}
                     widths={[160, 240, 360]}
                     sizes="90px"
+                    draggable="false"
                     class="block aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.06] motion-reduce:transition-none"
                   />
+                  {/* Press-and-hold progress: fills from the bottom in the section colour; the photo opens when full. */}
+                  <span
+                    aria-hidden="true"
+                    class="pointer-events-none absolute inset-0 origin-bottom scale-y-0 bg-(--c)/40 group-data-holding:scale-y-100 group-data-holding:transition-transform group-data-holding:duration-500 group-data-holding:ease-linear"
+                  />
+                  {/* "Hold to enlarge" hint, on hover (or once selected, for touch). */}
+                  <span
+                    aria-hidden="true"
+                    class="pointer-events-none absolute top-1 right-1 rounded-full bg-crust/75 px-1.5 py-0.5 text-[0.6rem] leading-none text-heading opacity-0 transition-opacity group-hover:opacity-100 group-data-active:opacity-100"
+                  >
+                    hold ⤢
+                  </span>
                 </button>
               ) : (
                 <div
@@ -230,7 +243,7 @@ const profileTicks = profileEnds.slice(1, -2);---
               <dialog
                 data-photo-dialog={i}
                 aria-label={ph.section}
-                class="m-auto max-h-[calc(100dvh-2rem)] w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
+                class="m-auto max-h-[calc(100dvh-2rem)] w-fit max-w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
               >
                 <figure class="m-0 flex flex-col">
                   <Image
@@ -238,7 +251,7 @@ const profileTicks = profileEnds.slice(1, -2);---
                     alt={ph.alt}
                     widths={[960, 1600, 2400]}
                     sizes="90vw"
-                    class="block h-auto max-h-[calc(100dvh-7rem)] w-full bg-crust object-contain"
+                    class="block h-auto max-h-[calc(100dvh-7rem)] w-auto max-w-full bg-crust object-contain"
                   />
                   <figcaption class="flex items-center justify-between gap-4 px-5 py-2 text-[0.8rem]">
                     <span>
@@ -640,11 +653,41 @@ const profileTicks = profileEnds.slice(1, -2);---
     document.addEventListener('pct:map-leave', hidePoint);
   }
 
-  // Click a photo to see it full size.
+  // Press and hold a photo to see it full size (a click or tap only selects it, see above). While held, the tile
+  // gets data-holding and fills up over HOLD_MS; letting go or moving the finger (swiping the strip) cancels.
+  // Enter / Space on the focused photo opens it straight away.
+  const HOLD_MS = 500;
   document.querySelectorAll<HTMLButtonElement>('[data-photo-open]').forEach((button) => {
     const dialog = document.querySelector<HTMLDialogElement>(`[data-photo-dialog="${button.dataset.photoOpen}"]`);
-    if (!dialog) return;
-    button.addEventListener('click', () => dialog.showModal());
+    const tile = button.closest<HTMLElement>('[data-pct-photo]');
+    if (!dialog || !tile) return;
+    let timer: number | undefined;
+    let start: [number, number] | undefined;
+    const cancel = () => {
+      window.clearTimeout(timer);
+      timer = undefined;
+      start = undefined;
+      tile.removeAttribute('data-holding');
+    };
+    button.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      start = [e.clientX, e.clientY];
+      tile.toggleAttribute('data-holding', true);
+      timer = window.setTimeout(() => {
+        cancel();
+        dialog.showModal();
+      }, HOLD_MS);
+    });
+    button.addEventListener('pointermove', (e) => {
+      if (start && Math.hypot(e.clientX - start[0], e.clientY - start[1]) > 10) cancel();
+    });
+    for (const type of ['pointerup', 'pointerleave', 'pointercancel'] as const) button.addEventListener(type, cancel);
+    // Long presses on touch screens would otherwise open the browser's image menu.
+    button.addEventListener('contextmenu', (e) => e.preventDefault());
+    // detail is 0 for clicks from the keyboard.
+    button.addEventListener('click', (e) => {
+      if (e.detail === 0) dialog.showModal();
+    });
     dialog.querySelector('[data-photo-close]')?.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', (e) => {
       if (e.target === dialog) dialog.close();

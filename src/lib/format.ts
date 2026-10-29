@@ -28,6 +28,11 @@ export function elevation(metres: number, units: Units): string {
   return units === 'metric' ? `${num(metres)} m` : `${num(metres * 3.28084)} ft`;
 }
 
+/** Weights are stored in kilograms. 30 -> "30 kg" / "66 lb". */
+export function weight(kg: number, units: Units): string {
+  return units === 'metric' ? `${num(kg)} kg` : `${num(kg * 2.20462)} lb`;
+}
+
 /** Escapes text and colours each **phrase**, taking the colour classes in turn. Used for the header pitch. */
 export function highlight(text: string, colours: string[]): string {
   let i = 0;

@@ -18,7 +18,7 @@ const items: { label: string; links: Link[]; after?: string }[] = [
   },
   { label: 'source', links: [{ label: 'GitHub', href: 'https://github.com/neilfoxcroft/neilfoxcroft.com' }] },
   { label: 'inspired by', links: [{ label: 'Brittany Chiang', href: 'https://brittanychiang.com' }] },
-  { label: 'colours', links: [{ label: 'Catppuccin Mocha', href: 'https://catppuccin.com' }] },
+  { label: 'colours', links: [{ label: 'Catppuccin', href: 'https://catppuccin.com' }] },
   {
     label: 'with help from',
     links: [
@@ -28,8 +28,8 @@ const items: { label: string; links: Link[]; after?: string }[] = [
 ];
 ---
 
-<footer class="relative mx-auto max-w-[1180px] px-5 pb-10 md:px-12">
-  <ul class="m-0 flex list-none flex-col gap-0 border-t border-line p-0 pt-6 text-[0.8rem] sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-1 xl:flex-nowrap xl:justify-between xl:gap-x-4">
+<footer class="relative mx-auto max-w-[1180px] px-5 pb-8 md:px-12">
+  <ul class="m-0 flex list-none flex-col gap-0 border-t border-line p-0 pt-4 text-[0.72rem] sm:flex-row sm:flex-wrap sm:gap-x-7 sm:gap-y-0.5 xl:flex-nowrap xl:justify-between xl:gap-x-4">
     {
       items.map((item) => (
         <li class="whitespace-nowrap text-muted">
@@ -44,9 +44,10 @@ const items: { label: string; links: Link[]; after?: string }[] = [
                   rel="noopener"
                   aria-label={l.label}
                   title={l.label}
-                  class="inline-block py-1 align-middle text-text hover:text-accent"
+                  class="inline-block py-1 text-text hover:text-accent"
                 >
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="size-[1.15em]" fill="currentColor">
+                  {/* Sits on the text baseline (like a letter), so this item lines up with the others. */}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="inline-block size-[1.15em] align-[-0.2em]" fill="currentColor">
                     <path d={l.logo} />
                   </svg>
                 </a>
@@ -61,5 +62,54 @@ const items: { label: string; links: Link[]; after?: string }[] = [
         </li>
       ))
     }
+    {/*
+      Light / dark switch, the last item on the line, styled like the other footer links. It names the theme it
+      switches to; both labels are in the markup and CSS shows the right one (global.css), so nothing flickers
+      while the page loads. The choice is saved and applied before paint by Base.astro.
+    */}
+    <li class="whitespace-nowrap text-muted">
+      <span class="text-accent">//</span> theme{' '}
+      <button
+        type="button"
+        data-theme-toggle
+        class="inline-block cursor-pointer py-1 text-text transition-colors hover:text-accent"
+      >
+        <span data-theme-show="dark">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="inline-block size-[1em] align-[-0.125em]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>{' '}
+          light
+        </span>
+        <span data-theme-show="light">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="inline-block size-[1em] align-[-0.125em]" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path>
+          </svg>{' '}
+          dark
+        </span>
+      </button>
+    </li>
   </ul>
 </footer>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const isLight = () => document.documentElement.dataset.theme === 'light';
+  const render = () => {
+    toggle?.setAttribute('aria-pressed', String(isLight()));
+    toggle?.setAttribute('aria-label', `Switch to ${isLight() ? 'dark' : 'light'} mode`);
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', isLight() ? '#eff1f5' : '#1e1e2e');
+  };
+  toggle?.addEventListener('click', () => {
+    if (isLight()) delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = 'light';
+    try {
+      localStorage.setItem('theme', isLight() ? 'light' : 'dark');
+    } catch {
+      // Storage can be unavailable (private mode); the switch still works for this visit.
+    }
+    render();
+    document.dispatchEvent(new CustomEvent('themechange'));
+  });
+  render();
+</script>

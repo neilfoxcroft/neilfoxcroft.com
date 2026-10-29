@@ -35,7 +35,7 @@
           "url": "https://www.shopriteholdings.co.za/group/brands/financial-services-customer-rewards.html",
           "startDate": "2024",
           "endDate": "2026",
-          "summary": "Built Kotlin and Spring Boot services for electricity, airtime, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, and owned the Namibia and Botswana electricity integrations end to end.",
+          "summary": "Built Kotlin and Spring Boot services for electricity, airtime and data, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, owned the Namibia and Botswana electricity integrations end to end, and helped onboard developers and review code.",
           "keywords": ["Kotlin", "Spring Boot", "BFF", "Datadog", "WireMock"]
         },
         {
@@ -68,7 +68,9 @@
       "area": "Computer Science & IT",
       "startDate": "2021",
       "endDate": "2021",
-      "summary": "In my Honours year I specialised in Artificial Intelligence, Advanced Databases, Computer Security and Information Systems Engineering (project management of information systems). For my Honours project I set out to detect StyleGAN-generated images using convolutional neural networks."
+      "summary": "I specialised in Artificial Intelligence, Advanced Databases, Computer Security and Information Systems Engineering (project management of information systems), and my Honours project set out to detect StyleGAN-generated images using convolutional neural networks. Alongside my studies I tutored the undergraduate Computer Networks module (CMPG 315), helping run the practicals, giving feedback on assignments and getting students to grips with Cisco Packet Tracer.",
+      "activities": [{ "date": "2021", "name": "Tutor, Computer Networks (CMPG 315)" }],
+      "link": { "label": "the StyleGAN project", "href": "#stylegan" }
     },
     {
       "institution": "North-West University",
@@ -101,31 +103,26 @@
   ],
   "projects": [
     {
+      "id": "stylegan",
+      "name": "Identifying StyleGAN faces",
+      "kind": "Honours project · 2021",
+      "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained convolutional neural networks to tell those faces apart from photos of real people, and built a small web app to try the model on an image.",
+      "keywords": ["Deep learning", "CNNs", "Python", "LaTeX"],
+      "url": "https://github.com/neilfoxcroft/StyleGAN-Identification"
+    },
+    {
       "name": "BLEGO: Braille-like toy blocks",
       "kind": "Patent · 2017",
       "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
       "keywords": ["FIRST LEGO League", "Accessibility"]
-    },
-    {
-      "name": "[Homelab write-up]",
-      "kind": "[Coming soon]",
-      "placeholder": true,
-      "description": "[Placeholder: the self-hosted stack, the hardware, and how it is deployed and managed.]",
-      "keywords": ["[tags]"]
-    },
-    {
-      "name": "[Public backend project]",
-      "kind": "[Coming soon]",
-      "placeholder": true,
-      "description": "[Placeholder: a small Spring Boot or Kotlin service with Terraform that shows how you design and ship backend work.]",
-      "keywords": ["[tags]"]
     }
   ],
   "places": {
-    "title": "Places I've been",
-    "intro": "A dark world, lit up wherever I've been. Drag it to spin it.",
+    "title": "places I've been",
+    "hint": "drag to spin · double-click to reset",
     "countries": [
       "South Africa",
+      "Namibia",
       "United Arab Emirates",
       "Germany",
       "Lesotho",
@@ -136,7 +133,7 @@
   },
   "pct": {
     "heading": "Mexico to Canada, on foot",
-    "intro": "In 2026 I thru-hiked the Pacific Crest Trail, from the Mexican border to the Canadian border, through the deserts, the Sierra Nevada and the Cascades. [A few lines in your own words: why you did it, a highlight, what it taught you.]",
+    "intro": "In 2026 my fiancée and I thru-hiked the Pacific Crest Trail, from the Mexican border to the Canadian border, through the deserts, the Sierra Nevada and the Cascades. It was a dream we had chased for four years: for us it's indescribable, and for anyone else, unimaginable.",
     "stats": [
       { "miles": 2650, "label": "trail length" },
       { "value": "164", "label": "days on trail" },
@@ -181,21 +178,24 @@
         {
           "value": "∞",
           "label": "soda refills",
-          "note": "My trail name was Refill, which explains a lot. [In your own words: how you got the name.]"
+          "note": "My trail name was Refill: whenever we were in town, I was always on the free refills that America is famous for."
         },
-        { "value": "less than needed", "label": "burgers" },
+        { "value": "too boku", "label": "climbs" },
+        { "kg": 30, "label": "weight loss" },
+        { "value": "4", "label": "injuries" },
+        { "value": "1", "label": "injurknees" },
         { "value": "enough", "label": "life-changing moments" }
       ],
-      "footnote": "Some of these are hard facts. The ones marked ≈ are guesstimates, because nothing was really being tracked, but they are honest guesstimates."
+      "footnote": "Some of these are hard facts. The ones marked ≈ are honest guesstimates, because nothing was really being tracked that extensively."
     },
     "photos": [
-      { "section": "Start", "miles": [0], "endsAt": { "place": "Southern Terminus", "lonLat": [-116.467, 32.59] }, "image": null, "alt": "" },
-      { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
-      { "section": "Sierra", "miles": [702, 1195], "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": null, "alt": "" },
-      { "section": "NorCal", "miles": [1195, 1689], "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": null, "alt": "" },
-      { "section": "Oregon", "miles": [1689, 2147], "startsAt": "California border", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
-      { "section": "Washington", "short": "Wash.", "miles": [2147, 2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": null, "alt": "" },
-      { "section": "End", "miles": [2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.787, 49.063] }, "image": null, "alt": "" }
+      { "section": "Start", "miles": [0], "endsAt": { "place": "Southern Terminus", "lonLat": [-116.467, 32.59] }, "image": "pct-1.jpg", "alt": "Neil at the Southern Terminus monument on the Mexican border, shading his eyes and looking north" },
+      { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": "pct-2.jpg", "alt": "Neil hiking towards huge tilted sandstone slabs in the Southern California desert" },
+      { "section": "Sierra", "miles": [702, 1195], "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": "pct-3.jpg", "alt": "Neil on the summit of Mount Whitney, holding up the 14,505 ft summit sign" },
+      { "section": "NorCal", "miles": [1195, 1689], "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": "pct-4.jpg", "alt": "Neil cooling off in a river in Northern California, with a butterfly by his hand" },
+      { "section": "Oregon", "miles": [1689, 2147], "startsAt": "California border", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": "pct-5.jpg", "alt": "Neil hiking through a lava field in Oregon" },
+      { "section": "Washington", "short": "Wash.", "miles": [2147, 2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": "pct-6.jpg", "alt": "Neil's fiancée hiking a steep mountainside trail in Washington, the slope red and gold with autumn colours" },
+      { "section": "End", "miles": [2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.787, 49.063] }, "image": "pct-7.jpg", "alt": "Neil and his fiancée at the Northern Terminus monument on the Canadian border" }
     ]
   }
 }

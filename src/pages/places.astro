@@ -13,31 +13,35 @@ const lit = [...globe.countries, ...globe.states];
 ---
 
 <Base title="Places I've been — Neil Foxcroft" description="The countries and US states Neil Foxcroft has been to, on a spinning globe.">
-  <main class="mx-auto flex max-w-[880px] flex-col gap-10 px-5 py-14 md:px-12 md:py-24">
+  {/*
+    On desktop-sized screens (lg and up) the whole page fits the window without scrolling: the page is one
+    screen tall, the footer sits at the bottom, and the globe is sized from the window height.
+  */}
+  <div class="lg:flex lg:h-dvh lg:flex-col">
+  <main class="mx-auto flex w-full max-w-[1100px] flex-col gap-10 px-5 py-14 md:px-12 md:py-20 lg:min-h-0 lg:flex-1 lg:gap-6 lg:py-10">
     <a href="/" class="inline-flex min-h-[44px] items-center gap-2 self-start font-semibold">
       <span aria-hidden="true" class="text-accent">←</span> back to neilfoxcroft.com
     </a>
 
-    <div class="flex flex-col gap-3">
-      <p class="m-0 text-[0.8rem] text-muted"><span class="text-accent">//</span> places</p>
-      <h1 class="m-0 text-[2.4rem] leading-[1.1] font-bold tracking-tight text-heading sm:text-[2.75rem]">
-        {places.title}
-      </h1>
-      <p class="m-0 max-w-[34rem]">{places.intro}</p>
-    </div>
+    {/* The page's heading is the small "// places I've been" label, in the site's section-label style. */}
+    <h1 class="m-0 text-[0.8rem] font-normal text-muted"><span class="text-accent">//</span> {places.title}</h1>
 
-    <figure class="m-0 flex flex-col items-center gap-4">
-      <canvas
-        data-globe
-        role="img"
-        aria-label={`A globe with the places I've been lit up: ${lit.map((p) => p.name).join(', ')}.`}
-        class="aspect-square w-full max-w-[560px] cursor-grab touch-none active:cursor-grabbing"
-      ></canvas>
-      {/* Name of the lit place under the pointer (or last tapped). */}
-      <p data-globe-readout aria-hidden="true" class="m-0 h-6 text-[0.85rem] text-muted"></p>
-    </figure>
+    {/* Globe and the lists side by side on wide screens; stacked on phones and tablets. */}
+    <div class="flex flex-col gap-10 lg:min-h-0 lg:flex-1 lg:flex-row lg:items-center lg:gap-16">
+      <figure class="m-0 flex w-full max-w-[560px] flex-col items-center gap-4 self-center lg:w-[min(560px,calc(100dvh-17rem))] lg:shrink-0 lg:gap-2 lg:self-auto">
+        <canvas
+          data-globe
+          role="img"
+          aria-label={`A globe with the places I've been lit up: ${lit.map((p) => p.name).join(', ')}.`}
+          class="aspect-square w-full cursor-grab touch-none active:cursor-grabbing"
+        ></canvas>
+        {/* Name of the lit place under the pointer (or last tapped); the hint shows otherwise. */}
+        <p data-globe-readout data-hint={places.hint} aria-hidden="true" class="m-0 h-6 text-[0.85rem] text-muted">
+          {places.hint}
+        </p>
+      </figure>
 
-    <div class="flex flex-col gap-6 sm:flex-row sm:gap-16">
+    <div class="flex flex-col gap-6 sm:flex-row sm:gap-16 lg:gap-12">
       {
         globe.countries.length + Number(globe.usa) > 0 && (
           <div class="flex flex-col gap-2">
@@ -79,8 +83,10 @@ const lit = [...globe.countries, ...globe.states];
         )
       }
     </div>
+    </div>
   </main>
   <Footer />
+  </div>
 
   <script is:inline type="application/json" id="globe-data" set:html={JSON.stringify({ lit, land: globe.land })} />
 </Base>
@@ -133,8 +139,9 @@ const lit = [...globe.countries, ...globe.states];
     };
     const graticule = geoGraticule10();
 
-    // Start over the Atlantic, tilted a little so more of the northern hemisphere shows.
-    let rotation: [number, number] = [20, -15];
+    // Start over the Atlantic, tilted a little so more of the northern hemisphere shows. Double-click returns here.
+    const HOME: [number, number] = [20, -15];
+    let rotation: [number, number] = [...HOME];
     let hovered: Place | undefined;
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const SPIN = 6; // degrees a second
@@ -207,10 +214,23 @@ const lit = [...globe.countries, ...globe.states];
     const showName = (p: Place | undefined) => {
       hovered = p;
       if (readout) {
-        readout.textContent = p ? `// ${p.name}` : '';
+        readout.textContent = p ? `// ${p.name}` : (readout.dataset.hint ?? '');
         readout.style.color = p?.colour ?? '';
       }
     };
+
+    // Double-click (or double-tap) eases the globe back to its starting view, the short way round.
+    let homing: { from: [number, number]; to: [number, number]; start: number } | undefined;
+    const HOMING_MS = 900;
+    canvas.addEventListener('dblclick', () => {
+      const dLon = ((((HOME[0] - rotation[0]) % 360) + 540) % 360) - 180;
+      if (reduceMotion) {
+        rotation = [...HOME];
+        requestAnimationFrame(draw);
+        return;
+      }
+      homing = { from: [...rotation], to: [rotation[0] + dLon, HOME[1]], start: performance.now() };
+    });
 
     // Where the mouse rests over the globe, so the name keeps up as places spin under it.
     let mouse: [number, number] | undefined;
@@ -220,6 +240,7 @@ const lit = [...globe.countries, ...globe.states];
     let resumeAt = 0;
     canvas.addEventListener('pointerdown', (e) => {
       canvas.setPointerCapture(e.pointerId);
+      homing = undefined; // grabbing the globe interrupts a reset
       drag = { x: e.clientX, y: e.clientY, rotation: [...rotation], moved: false };
     });
     canvas.addEventListener('pointermove', (e) => {
@@ -264,7 +285,18 @@ const lit = [...globe.countries, ...globe.states];
       const frame = (now: number) => {
         const dt = Math.min(now - last, 100) / 1000;
         last = now;
-        if (!drag && now > resumeAt) {
+        if (homing && !drag) {
+          const t = Math.min(1, (now - homing.start) / HOMING_MS);
+          const ease = 1 - (1 - t) ** 3;
+          rotation = [
+            homing.from[0] + (homing.to[0] - homing.from[0]) * ease,
+            homing.from[1] + (homing.to[1] - homing.from[1]) * ease,
+          ];
+          if (t === 1) {
+            homing = undefined;
+            resumeAt = now + 1500; // rest at the starting view for a moment before spinning on
+          }
+        } else if (!drag && now > resumeAt) {
           rotation = [rotation[0] + SPIN * dt, rotation[1]];
           projection.rotate(rotation);
           if (mouse) showName(placeAt(...mouse));

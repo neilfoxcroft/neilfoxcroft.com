@@ -45,10 +45,21 @@ const ogImage = new URL('/og-image.png', Astro.site);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
+    {
+      /* Visitor stats: GoatCounter (cookie-free, no IP addresses stored), dashboard at foxcroft.goatcounter.com.
+         Only in production builds, so local development never counts as a visit. */
+      import.meta.env.PROD && (
+        <script is:inline data-goatcounter="https://foxcroft.goatcounter.com/count" async src="https://gc.zgo.at/count.js" />
+      )
+    }
     <script is:inline>
-      // Apply the remembered km/mi choice before the page paints, so there's no flash of the wrong units.
+      // Apply the remembered km/mi and light/dark choices before the page paints, so nothing flashes.
       try {
         if (localStorage.getItem('units') === 'imperial') document.documentElement.dataset.units = 'imperial';
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+          document.querySelector('meta[name="theme-color"]').content = '#eff1f5';
+        }
       } catch {}
     </script>
   </head>

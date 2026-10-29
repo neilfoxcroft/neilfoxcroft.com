@@ -6,7 +6,7 @@ import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import UnitToggle from '../components/UnitToggle.astro';
 import resume from '../data/resume.json';
-import { distance, elevation } from '../lib/format';
+import { distance, elevation, weight } from '../lib/format';
 
 const { pct } = resume;
 const more = pct.moreStats;
@@ -32,6 +32,9 @@ const extra: Row[] = more.items.map((s) => {
       guess,
       note,
     };
+  }
+  if ('kg' in s && typeof s.kg === 'number') {
+    return { label: s.label, metric: weight(s.kg, 'metric'), imperial: weight(s.kg, 'imperial'), guess, note };
   }
   return { label: s.label, metric: 'value' in s ? String(s.value) : '', guess, note };
 });
@@ -59,11 +62,11 @@ const rows = [...headline, ...extra];
       <p class="m-0 max-w-[34rem]">{more.intro}</p>
     </div>
 
-    <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+    <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3">
       {
         rows.map((r, i) => (
-          <div class="stat group relative flex flex-col-reverse">
-            <dt class="flex items-center gap-1.5 text-[0.85rem] text-muted">
+          <div class="stat group relative flex flex-col-reverse justify-end">
+            <dt class="flex items-center gap-1.5 text-[0.8rem] text-muted">
               {r.label}
               {r.note && (
                 <button
@@ -81,7 +84,7 @@ const rows = [...headline, ...extra];
                 </button>
               )}
             </dt>
-            <dd class="m-0 text-[1.6rem] leading-tight font-bold text-accent sm:text-[2rem]">
+            <dd class="m-0 text-[1.35rem] leading-tight font-bold text-accent sm:text-[1.6rem]">
               {r.guess && (
                 <span class="mr-1 font-normal text-muted" title="guesstimate">
                   ≈

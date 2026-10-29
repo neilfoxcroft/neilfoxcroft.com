@@ -42,7 +42,7 @@ import { dateRange } from '../lib/format';
           <dialog
             data-edu-dialog={i}
             aria-labelledby={`edu-title-${i}`}
-            class="m-auto h-[min(44rem,calc(100dvh-2rem))] w-[min(40rem,calc(100vw-2rem))] sm:h-[min(31rem,calc(100dvh-2rem))] overflow-y-auto rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/70 backdrop:backdrop-blur-sm"
+            class="m-auto h-[min(44rem,calc(100dvh-2rem))] w-[min(40rem,calc(100vw-2rem))] sm:h-[min(35rem,calc(100dvh-2rem))] overflow-y-auto rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/70 backdrop:backdrop-blur-sm"
           >
             <div class="flex min-h-full flex-col gap-2 p-6">
               <div class="flex items-start justify-between gap-4">
@@ -80,6 +80,14 @@ import { dateRange } from '../lib/format';
                       ))}
                     </ul>
                   </>
+                )
+              }
+              {
+                /* An in-page link (e.g. to a project) closes the dialog before scrolling there. */
+                'link' in ed && ed.link && (
+                  <a href={ed.link.href} data-edu-link class="mt-4 inline-flex min-h-[44px] items-center gap-2 self-start font-semibold">
+                    {ed.link.label} <span aria-hidden="true" class="text-accent">→</span>
+                  </a>
                 )
               }
             </div>
@@ -128,6 +136,17 @@ import { dateRange } from '../lib/format';
     if (!dialog) return;
     button.addEventListener('click', () => dialog.showModal());
     dialog.querySelector('[data-edu-close]')?.addEventListener('click', () => dialog.close());
+    // Closing a dialog hands focus back to the button that opened it, which would scroll the page back to it,
+    // so close first and then scroll to the link's target.
+    dialog.querySelector<HTMLAnchorElement>('[data-edu-link]')?.addEventListener('click', (e) => {
+      const hash = e.currentTarget instanceof HTMLAnchorElement ? e.currentTarget.hash : '';
+      const target = hash ? document.querySelector<HTMLElement>(hash) : null;
+      if (!target) return;
+      e.preventDefault();
+      dialog.close();
+      target.scrollIntoView({ block: 'start' });
+      history.pushState(null, '', hash);
+    });
     // A click on the backdrop lands on the <dialog> element itself, not its content.
     dialog.addEventListener('click', (e) => {
       if (e.target === dialog) dialog.close();

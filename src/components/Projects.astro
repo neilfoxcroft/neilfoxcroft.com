@@ -9,11 +9,20 @@ import resume from '../data/resume.json';
   <ul class="flex flex-col gap-2">
     {
       resume.projects.map((p) => (
-        <li class="group flex flex-col gap-x-6 gap-y-2 rounded-[10px] border border-transparent py-3 transition-colors sm:flex-row lg:-mx-5 lg:p-5 lg:hover:border-line lg:hover:bg-heading/[0.035]">
+        <li
+          id={'id' in p ? p.id : undefined}
+          class="group flex scroll-mt-24 flex-col gap-x-6 gap-y-2 rounded-[10px] border border-transparent py-3 transition-colors sm:flex-row lg:-mx-5 lg:p-5 lg:hover:border-line lg:hover:bg-heading/[0.035]"
+        >
           <p class="m-0 shrink-0 text-[0.8rem] tracking-[0.04em] text-muted sm:mt-0.5 sm:w-[8.5rem]">{p.kind}</p>
           <div class="flex min-w-0 flex-1 flex-col gap-2">
             <h3 class="m-0 text-[1rem] leading-snug font-semibold text-heading transition-colors group-hover:text-accent">
-              {p.name}
+              {'url' in p && p.url ? (
+                <a href={p.url} target="_blank" rel="noopener" class="-my-1 inline-block py-1 text-heading group-hover:text-accent">
+                  {p.name} <span aria-hidden="true">↗</span>
+                </a>
+              ) : (
+                p.name
+              )}
             </h3>
             <p class="m-0 text-[0.9rem]">{p.description}</p>
             <Tags items={p.keywords} />
