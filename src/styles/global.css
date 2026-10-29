@@ -36,6 +36,11 @@
     @apply text-heading transition-colors hover:text-accent;
   }
 
+  /* Links inside running text get an underline so they don't rely on colour alone. */
+  p a {
+    @apply underline decoration-line-strong decoration-1 underline-offset-4 hover:decoration-accent;
+  }
+
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent rounded-sm;
   }

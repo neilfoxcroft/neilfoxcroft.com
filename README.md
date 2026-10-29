@@ -1,68 +1,76 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# neilfoxcroft.com
 
-## Available Scripts
+Source for [neilfoxcroft.com](https://neilfoxcroft.com), the personal site of Neil Foxcroft, a backend software engineer working with Java, Kotlin and Spring Boot.
 
-In the project directory, you can run:
+It's a single static page: about, experience, education, projects, and an interactive map of my Pacific Crest Trail thru-hike.
 
-### `npm start`
+## Stack
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- [Astro](https://astro.build): builds the site to plain HTML/CSS with almost no JavaScript
+- [Tailwind CSS](https://tailwindcss.com) for styling, with colours from [Catppuccin](https://catppuccin.com) Mocha
+- [JetBrains Mono](https://www.jetbrains.com/lp/mono/), self-hosted via Fontsource
+- [d3-geo](https://d3js.org/d3-geo) to project the PCT map at build time into a static SVG
+- TypeScript, Node 22+
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+The only client-side JavaScript is a few small scripts: the nav highlight, the experience timeline, the cursor spotlight and the map's hover effects. All of them respect `prefers-reduced-motion`.
 
-### `npm test`
+## Running locally
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+npm run dev       # http://localhost:4321
+npm run build     # type-check, then build to dist/
+npm run preview   # serve the built dist/ locally
+```
 
-### `npm run build`
+## Editing content
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+All CV content lives in [`src/data/resume.json`](src/data/resume.json), loosely following the [JSON Resume](https://jsonresume.org/schema) schema:
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+- `basics`: name, title, pitch, location, links and the About paragraphs (wrap a name in `**double asterisks**` to emphasise it)
+- `work`: Entelect, with each client or internal engagement under `engagements`
+- `education`, `certificates`, `projects`
+- `pct`: the trail intro, stats, journal link and photo slots
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Change the file and the page updates; no component changes needed. The résumé PDF lives at `public/files/NeilFoxcroftResume.pdf`.
 
-### `npm run eject`
+If you change the name, title or pitch, regenerate the social-share image and icons:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+node scripts/make-icons.mjs
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## The PCT map
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+The map is drawn at build time by [`src/lib/pct-map.ts`](src/lib/pct-map.ts):
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- State outlines: [us-atlas](https://github.com/topojson/us-atlas) (US Census Bureau)
+- Canada and Mexico: [world-atlas](https://github.com/topojson/world-atlas) (Natural Earth)
+- The trail: [OpenStreetMap](https://www.openstreetmap.org/relation/1225378), © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright)
 
-## Learn More
+The trail line is stored in [`src/data/pct-trail.json`](src/data/pct-trail.json), so builds never go online. To refresh it from OpenStreetMap (e.g. after a reroute):
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+node scripts/fetch-pct-trail.mjs
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The script downloads the trail's route relations from the Overpass API (~17 MB), stitches the pieces into one line from Campo to Manning Park, checks its length, simplifies it and saves it.
 
-### Code Splitting
+## Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+The site is hosted on AWS. CodeBuild runs [`buildspec.yml`](buildspec.yml) (`npm install`, `npm run build`) and publishes the contents of `dist/`, which are served from S3. `dist/404.html` is the error page.
 
-### Analyzing the Bundle Size
+## Project layout
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```
+src/
+  components/   one component per section (Header, About, Experience, PctMap, ...)
+  data/         resume.json (content) and pct-trail.json (map route)
+  layouts/      page shell: meta tags, fonts, icons
+  lib/          small helpers and the build-time map projection
+  pages/        index.astro (the site) and 404.astro
+  styles/       Tailwind setup and the Catppuccin colour tokens
+scripts/        one-off scripts: OSM trail fetch, icon/OG image generation
+public/         static files copied as-is (icons, OG image, résumé PDF)
+docs/redesign/  the design brief and approved mockup for this version
+```
