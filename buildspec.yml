@@ -1,15 +1,32 @@
+# AWS CodeBuild (project neilfoxcroft-build, run by CodePipeline cicd-neilfoxcroft on pushes to master).
+# Builds the site and deploys it to S3 behind CloudFront. Deploying happens in the build phase, after the build,
+# so a failed build never touches the live site.
+#
+# Caching: Astro's hashed files in _astro/ never change, so browsers and CloudFront keep them for a year.
+# Everything else (HTML, the CV, icons) is checked by browsers on each visit and kept by CloudFront for a day;
+# the invalidation at the end clears CloudFront's copy on every deploy. Keeping HTML cached at CloudFront also
+# keeps requests to S3 (which are billed per request) low, however much traffic arrives.
 version: 0.2
 
+env:
+  variables:
+    BUCKET: neilfoxcroft.com
+    DISTRIBUTION_ID: EAQFNSEB53K0Y
+
 phases:
+  install:
+    # Astro needs Node 22.23.4 or newer; the image's "22" may be an older 22.x, so use 24.
+    runtime-versions:
+      nodejs: 24
   pre_build:
     commands:
-      - npm install
+      - npm ci
   build:
     commands:
       - npm run build
-
-artifacts:
-  files:
-    - '**/*'
-  discard-paths: no
-  base-directory: dist
+      # New hashed assets first, so pages uploaded next never point at files that aren't there yet.
+      - aws s3 sync dist/_astro "s3://$BUCKET/_astro" --cache-control "public, max-age=31536000, immutable"
+      - aws s3 sync dist "s3://$BUCKET" --delete --exclude "_astro/*" --cache-control "public, max-age=0, s-maxage=86400, must-revalidate"
+      # Then remove hashed assets the new pages no longer use.
+      - aws s3 sync dist/_astro "s3://$BUCKET/_astro" --delete --cache-control "public, max-age=31536000, immutable"
+      - aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
