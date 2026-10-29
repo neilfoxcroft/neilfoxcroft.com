@@ -44,7 +44,12 @@ const photos = pct.photos.map((ph, i) => {
     wTo: profileEnds[i],
     colour: sectionColours[i % sectionColours.length],
     // Start and End are single points (a terminus), so they show just the place; sections show from → to.
-    route: prev && ph.miles.length > 1 ? `${prev.endsAt.place} → ${ph.endsAt.place}` : ph.endsAt.place,
+    // A section can name its start differently from where the previous one ended ("startsAt"), e.g. NorCal ends
+    // at the Oregon border but Oregon starts at the California border.
+    route:
+      prev && ph.miles.length > 1
+        ? `${('startsAt' in ph && ph.startsAt) || prev.endsAt.place} → ${ph.endsAt.place}`
+        : ph.endsAt.place,
     // Section distance in both units; the km/mi switch decides which is shown.
     dist: { metric: distanceRange(ph.miles, 'metric'), imperial: distanceRange(ph.miles, 'imperial') },
   };

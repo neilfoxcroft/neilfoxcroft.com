@@ -136,7 +136,7 @@
       { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
       { "section": "Sierra", "miles": [702, 1195], "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": null, "alt": "" },
       { "section": "NorCal", "miles": [1195, 1689], "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": null, "alt": "" },
-      { "section": "Oregon", "miles": [1689, 2147], "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
+      { "section": "Oregon", "miles": [1689, 2147], "startsAt": "California border", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
       { "section": "Washington", "short": "Wash.", "miles": [2147, 2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": null, "alt": "" },
       { "section": "End", "miles": [2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.787, 49.063] }, "image": null, "alt": "" }
     ]
