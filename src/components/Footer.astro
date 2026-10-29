@@ -1,13 +1,39 @@
 ---
+// Full-width footer under both columns: short labelled credits instead of one long sentence.
+type Link = { label: string; href: string };
+const items: { label: string; links: Link[]; after?: string }[] = [
+  {
+    label: 'built with',
+    links: [
+      { label: 'Astro', href: 'https://astro.build' },
+      { label: 'Tailwind CSS', href: 'https://tailwindcss.com' },
+    ],
+    after: '· AWS',
+  },
+  { label: 'source', links: [{ label: 'GitHub', href: 'https://github.com/neilfoxcroft/neilfoxcroft.com-repo' }] },
+  { label: 'inspired by', links: [{ label: 'Brittany Chiang', href: 'https://brittanychiang.com' }] },
+  { label: 'colours', links: [{ label: 'Catppuccin Mocha', href: 'https://catppuccin.com' }] },
+  { label: 'with help from', links: [{ label: 'Claude', href: 'https://claude.com/claude-code' }] },
+];
 ---
 
-<footer class="max-w-[26rem] pb-8">
-  <p class="m-0 text-[0.8rem] text-muted">
-    Built by Neil, with help from <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude</a>,
-    using <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> and{" "}
-    <a href="https://tailwindcss.com" target="_blank" rel="noopener">Tailwind CSS</a>, deployed on AWS. Source on{" "}
-    <a href="https://github.com/neilfoxcroft/neilfoxcroft.com-repo" target="_blank" rel="noopener">GitHub</a>. Layout
-    inspired by <a href="https://brittanychiang.com" target="_blank" rel="noopener">Brittany Chiang</a>; colours from{" "}
-    <a href="https://catppuccin.com" target="_blank" rel="noopener">Catppuccin</a> Mocha.
-  </p>
+<footer class="relative mx-auto max-w-[1180px] px-5 pb-10 md:px-12">
+  <ul class="m-0 flex list-none flex-col gap-0 border-t border-line p-0 pt-6 text-[0.8rem] sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-1 xl:flex-nowrap xl:justify-between xl:gap-x-4">
+    {
+      items.map((item) => (
+        <li class="whitespace-nowrap text-muted">
+          <span class="text-accent">//</span> {item.label}{' '}
+          {item.links.map((l, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={l.href} target="_blank" rel="noopener" class="inline-block py-1 text-text hover:text-accent">
+                {l.label}
+              </a>
+            </>
+          ))}
+          {item.after && <> {item.after}</>}
+        </li>
+      ))
+    }
+  </ul>
 </footer>

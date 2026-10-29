@@ -73,6 +73,7 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
    - On phones the tilt is gentler (`rotateX(35deg) rotateZ(-8deg)`, 80% width) so it fits 360px screens without sideways scroll.
    - Stats grid: 4,265 km trail length · 3 states · [days on trail] · [pairs of shoes]. Plus "[Read the trail journal]", and three photo slots (desert, Sierra, Cascades). The bracketed items are placeholders for Neil.
 6. **Footer**: "Built by Neil with [stack], deployed on AWS. Source on GitHub. Colours from Catppuccin Mocha." **Updated 2026-10-29:** also credits the layout inspiration: "Layout inspired by Brittany Chiang" (linked to brittanychiang.com), and Neil chose a light Claude mention: "Built by Neil, with help from Claude, using Astro and Tailwind CSS…".
+   - **Redesigned 2026-10-29 (Neil found it cluttered):** the footer now spans the full page width under both columns, above a thin divider, as short labelled items in the `//` style: `// built with Astro, Tailwind CSS · AWS`, `// source GitHub`, `// inspired by Brittany Chiang`, `// colours Catppuccin Mocha`, `// with help from Claude`. One line from 1280px, wrapping on narrower screens, one per line on phones. The OpenStreetMap credit stays under the map: the OSM guidelines require attribution "in the vicinity of the produced work" and don't allow for a page footer.
 
 ## Mobile (required, added 2026-10-29)
 
