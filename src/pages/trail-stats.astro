@@ -1,0 +1,173 @@
+---
+// /trail-stats/: the long list of PCT numbers, linked from the PCT section. Content comes from resume.json:
+// the headline stats (pct.stats) first, then pct.moreStats.items. Values marked "guess" get a faint ≈, and a
+// stat with a "note" gets a ? that shows the note on hover, tap or keyboard focus.
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import UnitToggle from '../components/UnitToggle.astro';
+import resume from '../data/resume.json';
+import { distance, elevation } from '../lib/format';
+
+const { pct } = resume;
+const more = pct.moreStats;
+
+type Row = { label: string; metric: string; imperial?: string; guess: boolean; note?: string };
+
+const headline: Row[] = pct.stats.map((s) =>
+  'miles' in s && s.miles
+    ? { label: s.label, metric: distance(s.miles, 'metric'), imperial: distance(s.miles, 'imperial'), guess: false }
+    : { label: s.label, metric: 'value' in s ? String(s.value) : '', guess: false },
+);
+
+const extra: Row[] = more.items.map((s) => {
+  const guess = 'guess' in s && !!s.guess;
+  const note = 'note' in s ? s.note : undefined;
+  if ('metres' in s) {
+    // Not filled in yet: a placeholder in either unit.
+    const m = s.metres as number | null;
+    return {
+      label: s.label,
+      metric: m == null ? '[?] m' : elevation(m, 'metric'),
+      imperial: m == null ? '[?] ft' : elevation(m, 'imperial'),
+      guess,
+      note,
+    };
+  }
+  return { label: s.label, metric: 'value' in s ? String(s.value) : '', guess, note };
+});
+
+const rows = [...headline, ...extra];
+---
+
+<Base
+  title="PCT trail stats — Neil Foxcroft"
+  description="Numbers from Neil Foxcroft's 2026 thru-hike of the Pacific Crest Trail: distance, elevation, days, shoes, rattlesnakes, sodas and burgers."
+>
+  <main class="mx-auto flex max-w-[880px] flex-col gap-12 px-5 py-14 md:px-12 md:py-24">
+    <a href="/" class="inline-flex min-h-[44px] items-center gap-2 self-start font-semibold">
+      <span aria-hidden="true" class="text-accent">←</span> back to neilfoxcroft.com
+    </a>
+
+    <div class="flex flex-col gap-3">
+      <p class="m-0 text-[0.8rem] text-muted"><span class="text-accent">//</span> pct</p>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <h1 class="m-0 text-[2.4rem] leading-[1.1] font-bold tracking-tight text-heading sm:text-[2.75rem]">
+          {more.title}
+        </h1>
+        <UnitToggle />
+      </div>
+      <p class="m-0 max-w-[34rem]">{more.intro}</p>
+    </div>
+
+    <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+      {
+        rows.map((r, i) => (
+          <div class="stat group relative flex flex-col-reverse">
+            <dt class="flex items-center gap-1.5 text-[0.85rem] text-muted">
+              {r.label}
+              {r.note && (
+                <button
+                  type="button"
+                  aria-describedby={`stat-note-${i}`}
+                  aria-label={`More about ${r.label}`}
+                  class="-my-2 inline-flex size-8 cursor-help items-center justify-center rounded-full text-accent"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="inline-flex size-[1.15rem] items-center justify-center rounded-full border border-current text-[0.7rem] leading-none"
+                  >
+                    ?
+                  </span>
+                </button>
+              )}
+            </dt>
+            <dd class="m-0 text-[1.6rem] leading-tight font-bold text-accent sm:text-[2rem]">
+              {r.guess && (
+                <span class="mr-1 font-normal text-muted" title="guesstimate">
+                  ≈
+                </span>
+              )}
+              {r.imperial ? (
+                <>
+                  <span data-unit="metric" data-spin>
+                    {r.metric}
+                  </span>
+                  <span data-unit="imperial" data-spin>
+                    {r.imperial}
+                  </span>
+                </>
+              ) : (
+                // The font draws ∞ small, so it's scaled up to sit level with the other numbers.
+                <span data-spin class:list={[r.metric === '∞' && 'text-[1.6em] leading-[0.9]']}>
+                  {r.metric}
+                </span>
+              )}
+            </dd>
+            {r.note && (
+              <p
+                id={`stat-note-${i}`}
+                role="tooltip"
+                class="tip invisible absolute top-full z-10 m-0 mt-2 w-[min(17rem,calc(100vw-2.5rem))] rounded-md border border-line-strong bg-mantle px-4 py-3 text-[0.8rem] leading-relaxed text-text opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+              >
+                {r.note}
+              </p>
+            )}
+          </div>
+        ))
+      }
+    </dl>
+
+    <p class="m-0 max-w-[34rem] border-t border-line pt-6 text-[0.8rem] text-muted">
+      <span class="text-accent">//</span> {more.footnote}
+    </p>
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  // On load, every digit in the stat numbers spins through random digits, then each stat settles on its real
+  // value, one after another. Only digits change (commas, units and words stay put), and the font is
+  // monospaced, so nothing shifts while it spins. Skipped with "reduce motion" on.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const els = [...document.querySelectorAll<HTMLElement>('[data-spin]')].filter((el) => /\d/.test(el.textContent ?? ''));
+    const finals = els.map((el) => el.textContent ?? '');
+    const scramble = (s: string) => s.replace(/\d/g, () => String(Math.floor(Math.random() * 10)));
+    const start = performance.now();
+    // Each stat spins for 0.6s, plus 60ms more per stat down the page, so they settle in reading order.
+    const settleAt = els.map((_, i) => 600 + i * 60);
+    const tick = (now: number) => {
+      let spinning = false;
+      els.forEach((el, i) => {
+        if (now - start >= settleAt[i]) {
+          if (el.textContent !== finals[i]) el.textContent = finals[i];
+        } else {
+          el.textContent = scramble(finals[i]);
+          spinning = true;
+        }
+      });
+      if (spinning) setTimeout(() => requestAnimationFrame(tick), 50);
+    };
+    requestAnimationFrame(tick);
+  }
+</script>
+
+<style>
+  /* Notes open towards the inside of the page: right-hand column notes are anchored to the right. */
+  .tip {
+    left: 0;
+  }
+  .stat:nth-child(even) .tip {
+    left: auto;
+    right: 0;
+  }
+  @media (min-width: 40rem) {
+    .stat:nth-child(even) .tip {
+      left: 0;
+      right: auto;
+    }
+    .stat:nth-child(3n) .tip {
+      left: auto;
+      right: 0;
+    }
+  }
+</style>

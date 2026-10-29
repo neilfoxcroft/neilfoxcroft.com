@@ -12,7 +12,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - [ ] **PCT extras** in `pct`:
   - [x] days on trail (164: 14 Apr – 24 Sep 2026) and pairs of shoes (4), added 2026-10-29
   - the intro story (bracketed text in `pct.intro`)
-  - trail journal link (`pct.journal`; it becomes a real link once it has a URL)
+  - **trail stats page** (`pct.moreStats` → /trail-stats/, added 2026-10-29): the numbers are in (2026-10-29; steps is a guesstimate Neil may replace); still to write: the Refill story in the soda refills note. Mark guesses with `"guess": true`; add `"note"` for a hover explanation.
   - seven photos, one per section (2026-10-29): Start, Desert, Sierra, NorCal, Oregon, Washington, End. Drop each in `src/assets/pct/` and set `pct.photos[].image` and `alt` in resume.json (see README → PCT photos). Hover-to-map and click-to-enlarge are already built.
 
 ## Features to consider
@@ -26,4 +26,4 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - [ ] Restyle the CV to match the site (Neil plans to do this in Reactive Resume). While at it: page 2 holds only the language levels, and the PDF includes a phone number and photo, which will be public once deployed. Decide whether to keep them.
 - [x] Shoprite Financial Services URL: links to the Shoprite Holdings financial services page (2026-10-29).
 - [ ] Check the site with reduced motion on (Windows: Settings → Accessibility → Visual effects → Animation effects off).
-- [ ] Step 6, deploy: confirm the S3 bucket / CloudFront setup, set `404.html` as the error page, and ship the `redesign` branch.
+- [ ] Step 6, deploy: confirm the S3 bucket / CloudFront setup, set `404.html` as the error page, and ship the `redesign` branch. The site now has a second page, `/trail-stats/` (built as `trail-stats/index.html`): with CloudFront in front of a private S3 bucket, folder URLs need a small CloudFront Function that adds `index.html` (the S3 website endpoint does this by itself).

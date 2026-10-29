@@ -23,6 +23,11 @@ export function distance(miles: number, units: Units): string {
   return units === 'metric' ? `${num(miles * KM_PER_MILE)} km` : `${num(miles)} mi`;
 }
 
+/** Elevations are stored in metres. 4421 -> "4,421 m" / "14,505 ft". */
+export function elevation(metres: number, units: Units): string {
+  return units === 'metric' ? `${num(metres)} m` : `${num(metres * 3.28084)} ft`;
+}
+
 /** Escapes text and turns **name** into an emphasised span. Used for the About copy. */
 export function emphasise(text: string): string {
   return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<span class="font-semibold text-heading">$1</span>');

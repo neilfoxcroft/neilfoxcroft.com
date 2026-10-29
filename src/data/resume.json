@@ -126,11 +126,55 @@
     "intro": "In 2026 I thru-hiked the Pacific Crest Trail, from the Mexican border to the Canadian border, through the deserts, the Sierra Nevada and the Cascades. [A few lines in your own words: why you did it, a highlight, what it taught you.]",
     "stats": [
       { "miles": 2650, "label": "trail length" },
-      { "value": "3", "label": "states" },
       { "value": "164", "label": "days on trail" },
-      { "value": "4", "label": "pairs of shoes" }
+      { "value": "4", "label": "pairs of shoes" },
+      { "value": "3", "label": "states" }
     ],
-    "journal": { "label": "[Read the trail journal]" },
+    "moreStats": {
+      "link": "more trail stats",
+      "title": "Trail stats",
+      "intro": "The numbers behind 164 days on the Pacific Crest Trail, from the important to the ridiculous.",
+      "items": [
+        {
+          "metres": 149174.6,
+          "label": "elevation gain",
+          "note": "The whole trail, from Halfmile's GPS survey of the PCT (489,418 ft up)."
+        },
+        {
+          "metres": 148867.7,
+          "label": "elevation loss",
+          "note": "The whole trail, from Halfmile's GPS survey of the PCT (488,411 ft down)."
+        },
+        {
+          "value": "5,700,000",
+          "label": "steps",
+          "guess": true,
+          "note": "Not counted: about 4,265 km at roughly 75 cm a step."
+        },
+        { "value": "30+", "label": "rattlesnakes" },
+        { "value": "7", "label": "bears", "note": "Including 3 cubs and 2 mamas." },
+        { "value": "1", "label": "mountain lion" },
+        {
+          "value": "1,000+",
+          "label": "deer",
+          "guess": true,
+          "note": "NorCal was full of deer, so this number is exaggerated."
+        },
+        { "value": "10+", "label": "mountain goats" },
+        { "value": "1", "label": "pika" },
+        { "value": "18", "label": "trout" },
+        { "value": "2", "label": "snow storms" },
+        { "value": "5", "label": "wildfires" },
+        {
+          "value": "∞",
+          "label": "soda refills",
+          "note": "My trail name was Refill, which explains a lot. [In your own words: how you got the name.]"
+        },
+        { "value": "less than needed", "label": "burgers" },
+        { "value": "enough", "label": "life-changing moments" }
+      ],
+      "footnote": "Some of these are hard facts. The ones marked ≈ are guesstimates, because nothing was really being tracked, but they are honest guesstimates."
+    },
     "photos": [
       { "section": "Start", "miles": [0], "endsAt": { "place": "Southern Terminus", "lonLat": [-116.467, 32.59] }, "image": null, "alt": "" },
       { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
