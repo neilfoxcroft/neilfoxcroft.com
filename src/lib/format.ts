@@ -8,6 +8,21 @@ export function dateRange(start: string, end?: string): string {
 const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+export type Units = 'metric' | 'imperial';
+const KM_PER_MILE = 1.609344;
+const num = (n: number) => Math.round(n).toLocaleString('en-US');
+
+/** Trail distances are stored in miles. [702] -> "mi 702" / "km 1,130"; [0, 702] -> "mi 0–702" / "km 0–1,130". */
+export function distanceRange(miles: number[], units: Units): string {
+  const values = units === 'metric' ? miles.map((m) => m * KM_PER_MILE) : miles;
+  return `${units === 'metric' ? 'km' : 'mi'} ${values.map(num).join('–')}`;
+}
+
+/** 2650 -> "2,650 mi" / "4,265 km". */
+export function distance(miles: number, units: Units): string {
+  return units === 'metric' ? `${num(miles * KM_PER_MILE)} km` : `${num(miles)} mi`;
+}
+
 /** Escapes text and turns **name** into an emphasised span. Used for the About copy. */
 export function emphasise(text: string): string {
   return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<span class="font-semibold text-heading">$1</span>');

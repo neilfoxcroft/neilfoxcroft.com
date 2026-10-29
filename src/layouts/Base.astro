@@ -45,6 +45,12 @@ const ogImage = new URL('/og-image.png', Astro.site);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      // Apply the remembered km/mi choice before the page paints, so there's no flash of the wrong units.
+      try {
+        if (localStorage.getItem('units') === 'imperial') document.documentElement.dataset.units = 'imperial';
+      } catch {}
+    </script>
   </head>
   <body>
     <slot />

@@ -1,5 +1,6 @@
 ---
 import { buildPctMap, WIDTH, HEIGHT } from '../lib/pct-map';
+import UnitToggle from './UnitToggle.astro';
 
 // All projection maths happens here at build time; the browser just gets the SVG.
 const map = buildPctMap();
@@ -15,7 +16,11 @@ const map = buildPctMap();
   (0 to 1), which drives the coloured line's dash offset. Everything inside the SVG ignores the pointer, so the
   SVG itself gets every event and offsetX/offsetY are already mapped back through the 3D tilt by the browser.
 */}
-<div class="flex min-w-0 flex-col items-center gap-2">
+<div class="relative flex min-w-0 flex-col items-center gap-2">
+  {/* km / mi switch: top-right corner of the map area; on phones it sits on its own line above the map. */}
+  <div class="z-10 mb-2 self-end md:absolute md:top-0 md:right-0 md:mb-0">
+    <UnitToggle />
+  </div>
   <div id="pct-map" data-pct-map class="flex w-full justify-center perspective-[1600px]">
     <div
       data-pct-plane

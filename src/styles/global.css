@@ -49,6 +49,26 @@
     @apply bg-accent text-bg;
   }
 
+  /* Distance units (see UnitToggle.astro): show only the spans for the chosen units. Metric is the default. */
+  html:not([data-units='imperial']) [data-unit='imperial'],
+  html[data-units='imperial'] [data-unit='metric'] {
+    display: none;
+  }
+
+  /* km / mi switch (UnitToggle.astro): options are muted and the active one is mauve; the highlight behind
+     them slides to whichever unit is active. Both colour rules live here (not as utility classes) so the
+     more specific "active" rule wins. */
+  [data-unit-option] {
+    @apply text-muted transition-colors duration-300;
+  }
+  html:not([data-units='imperial']) [data-unit-option='metric'],
+  html[data-units='imperial'] [data-unit-option='imperial'] {
+    @apply text-accent;
+  }
+  html[data-units='imperial'] [data-units-thumb] {
+    transform: translateX(100%);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;

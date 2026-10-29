@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import resume from '../data/resume.json';
 import { buildPctMap } from '../lib/pct-map';
+import { distance, distanceRange } from '../lib/format';
 
 const { pct } = resume;
 
@@ -24,8 +25,9 @@ const photos = pct.photos.map((ph, i) => {
     src,
     // How much of the map's route to colour when this photo is hovered: up to where its section ends.
     f: fractionAtPlace(ph.endsAt.lonLat as [number, number]),
-    // Shown in the line under the strip, e.g. "Desert · mi 0–702 · Campo → Kennedy Meadows".
     route: prev ? `${prev.endsAt.place} → ${ph.endsAt.place}` : `Southern Terminus, ${ph.endsAt.place}`,
+    // Section distance in both units; the km/mi switch decides which is shown.
+    dist: { metric: distanceRange(ph.miles, 'metric'), imperial: distanceRange(ph.miles, 'imperial') },
   };
 });
 const readoutHint = 'Point at a photo to trace its section on the map';
@@ -55,7 +57,8 @@ const readoutHint = 'Point at a photo to trace its section on the map';
           <li
             data-pct-photo
             data-f={ph.f}
-            data-readout={`${ph.section} · ${ph.miles} · ${ph.route}`}
+            data-readout-metric={`${ph.section} · ${ph.dist.metric} · ${ph.route}`}
+            data-readout-imperial={`${ph.section} · ${ph.dist.imperial} · ${ph.route}`}
             class="group @container w-[5.5rem] shrink-0 snap-start sm:w-auto sm:min-w-[3.5rem] sm:flex-1"
           >
             <figure class="m-0 flex flex-col gap-1">
@@ -64,7 +67,7 @@ const readoutHint = 'Point at a photo to trace its section on the map';
                   type="button"
                   data-photo-open={i}
                   aria-haspopup="dialog"
-                  aria-label={`Enlarge photo: ${ph.section}, ${ph.miles}`}
+                  aria-label={`Enlarge photo: ${ph.section}`}
                   class="block cursor-zoom-in overflow-hidden rounded-lg border border-line transition-colors group-hover:border-accent group-data-active:border-accent"
                 >
                   <Image
@@ -78,7 +81,7 @@ const readoutHint = 'Point at a photo to trace its section on the map';
               ) : (
                 <div
                   tabindex="0"
-                  aria-label={`${ph.section}, ${ph.miles}: photo to come`}
+                  aria-label={`${ph.section}: photo to come`}
                   class="flex aspect-square items-center justify-center rounded-lg border border-dashed border-line-strong text-[0.8rem] text-muted transition-colors group-hover:border-accent group-data-active:border-accent"
                 >
                   +
@@ -100,7 +103,7 @@ const readoutHint = 'Point at a photo to trace its section on the map';
             {ph.src && (
               <dialog
                 data-photo-dialog={i}
-                aria-label={`${ph.section}, ${ph.miles}`}
+                aria-label={ph.section}
                 class="m-auto max-h-[calc(100dvh-2rem)] w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
               >
                 <figure class="m-0 flex flex-col">
@@ -115,7 +118,8 @@ const readoutHint = 'Point at a photo to trace its section on the map';
                     <span>
                       <span class="text-accent">//</span> {ph.section}{' '}
                       <span class="text-muted">
-                        · {ph.miles} · {ph.route}
+                        · <span data-unit="metric">{ph.dist.metric}</span>
+                        <span data-unit="imperial">{ph.dist.imperial}</span> · {ph.route}
                       </span>
                     </span>
                     <button
@@ -145,7 +149,16 @@ const readoutHint = 'Point at a photo to trace its section on the map';
         pct.stats.map((s) => (
           <div class="flex flex-col-reverse">
             <dt class="text-[0.8rem] text-muted">{s.label}</dt>
-            <dd class="m-0 text-[1.6rem] leading-tight font-bold whitespace-nowrap text-accent">{s.value}</dd>
+            <dd class="m-0 text-[1.6rem] leading-tight font-bold whitespace-nowrap text-accent">
+              {'miles' in s && s.miles ? (
+                <>
+                  <span data-unit="metric">{distance(s.miles, 'metric')}</span>
+                  <span data-unit="imperial">{distance(s.miles, 'imperial')}</span>
+                </>
+              ) : (
+                'value' in s && s.value
+              )}
+            </dd>
           </div>
         ))
       }
@@ -163,11 +176,19 @@ const readoutHint = 'Point at a photo to trace its section on the map';
   const done = document.querySelector<SVGGElement>('[data-pct-done]');
   const readout = document.querySelector<HTMLElement>('[data-pct-readout-text]');
   const tiles = document.querySelectorAll<HTMLElement>('[data-pct-photo]');
+  let active: HTMLElement | undefined;
+  const showReadout = () => {
+    if (!readout || !active) return;
+    const imperial = document.documentElement.dataset.units === 'imperial';
+    readout.textContent = (imperial ? active.dataset.readoutImperial : active.dataset.readoutMetric) ?? '';
+  };
+  document.addEventListener('unitschange', showReadout);
   tiles.forEach((tile) => {
     const select = () => {
       done?.style.setProperty('--done', tile.dataset.f ?? '0');
       tiles.forEach((t) => t.toggleAttribute('data-active', t === tile));
-      if (readout) readout.textContent = tile.dataset.readout ?? '';
+      active = tile;
+      showReadout();
     };
     tile.addEventListener('pointerenter', select);
     tile.addEventListener('pointerdown', select);

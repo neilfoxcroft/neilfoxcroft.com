@@ -18,6 +18,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 ## Features to consider
 
 - [ ] **Get in touch / contact**: a contact section on the page, or its own page. Today there's only the email icon in the header.
+- [ ] **km / mi switch design**: the current version (faint globe that grows into a `km │ mi` pill on hover, with a sliding highlight) is provisional, and the US flag is a placeholder drawing. Revisit the look (src/components/UnitToggle.astro).
 
 ## Already pending
 

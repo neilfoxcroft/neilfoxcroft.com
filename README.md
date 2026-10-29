@@ -30,7 +30,7 @@ All CV content lives in [`src/data/resume.json`](src/data/resume.json), loosely 
 - `basics`: name, title, pitch, location, links and the About paragraphs (wrap a name in `**double asterisks**` to emphasise it)
 - `work`: Entelect, with each client or internal engagement under `engagements`
 - `education`, `certificates`, `projects`
-- `pct`: the trail intro, stats, journal link and photo slots
+- `pct`: the trail intro, stats, journal link and photo slots. Distances are stored in miles (e.g. `"miles": [0, 702]`) and shown in km or mi depending on the switch by the map
 
 Change the file and the page updates; no component changes needed. The résumé PDF lives at `public/files/NeilFoxcroftResume.pdf`.
 

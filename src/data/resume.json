@@ -125,20 +125,20 @@
     "heading": "Mexico to Canada, on foot",
     "intro": "In 2026 I thru-hiked the Pacific Crest Trail, from the Mexican border at Campo to the Canadian border at Manning Park, through the deserts, the Sierra Nevada and the Cascades. [A few lines in your own words: why you did it, a highlight, what it taught you.]",
     "stats": [
-      { "value": "4,265 km", "label": "trail length" },
+      { "miles": 2650, "label": "trail length" },
       { "value": "3", "label": "states" },
       { "value": "164", "label": "days on trail" },
       { "value": "4", "label": "pairs of shoes" }
     ],
     "journal": { "label": "[Read the trail journal]" },
     "photos": [
-      { "section": "Start", "miles": "mi 0", "endsAt": { "place": "Campo", "lonLat": [-116.467, 32.59] }, "image": null, "alt": "" },
-      { "section": "Desert", "miles": "mi 0–702", "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
-      { "section": "Sierra", "miles": "mi 702–1195", "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": null, "alt": "" },
-      { "section": "NorCal", "miles": "mi 1195–1689", "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": null, "alt": "" },
-      { "section": "Oregon", "miles": "mi 1689–2147", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
-      { "section": "Washington", "short": "Wash.", "miles": "mi 2147–2650", "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": null, "alt": "" },
-      { "section": "End", "miles": "mi 2650", "endsAt": { "place": "Manning Park", "lonLat": [-120.787, 49.063] }, "image": null, "alt": "" }
+      { "section": "Start", "miles": [0], "endsAt": { "place": "Campo", "lonLat": [-116.467, 32.59] }, "image": null, "alt": "" },
+      { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": null, "alt": "" },
+      { "section": "Sierra", "miles": [702, 1195], "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": null, "alt": "" },
+      { "section": "NorCal", "miles": [1195, 1689], "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": null, "alt": "" },
+      { "section": "Oregon", "miles": [1689, 2147], "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": null, "alt": "" },
+      { "section": "Washington", "short": "Wash.", "miles": [2147, 2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": null, "alt": "" },
+      { "section": "End", "miles": [2650], "endsAt": { "place": "Manning Park", "lonLat": [-120.787, 49.063] }, "image": null, "alt": "" }
     ]
   }
 }
