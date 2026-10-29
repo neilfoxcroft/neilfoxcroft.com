@@ -1,0 +1,201 @@
+{
+  "basics": {
+    "name": "Neil Foxcroft",
+    "label": "Software Engineer",
+    "pitch": "I build the **Java and Kotlin** services that connect **banks, retailers and their partners**, and keep them running in production.",
+    "email": "neilfoxcroftpro@gmail.com",
+    "location": {
+      "city": "Pretoria",
+      "countryCode": "ZA",
+      "note": "open to relocation"
+    },
+    "profiles": [
+      { "network": "GitHub", "username": "neilfoxcroft", "url": "https://github.com/neilfoxcroft" },
+      { "network": "LinkedIn", "username": "neilfoxcroft", "url": "https://www.linkedin.com/in/neilfoxcroft/" }
+    ],
+    "resumeUrl": "/files/NeilFoxcroftResume.pdf",
+    "about": [
+      "I'm a backend engineer at **Entelect** with 4.5+ years building Java and Kotlin Spring Boot microservices for banking and retail financial services. Most of my work sits where systems meet: the APIs, integrations and orchestration that let digital channels, partners and point-of-sale systems talk to each other.",
+      "Most recently, at **Shoprite Financial Services**, I owned the electricity supplier integrations for Namibia and Botswana end to end, from requirements and partner calls through release and production support. Before that I spent two years on value-added services at **Standard Bank**.",
+      "Away from the keyboard I climb, hike (most recently the whole Pacific Crest Trail), am learning to paint Warhammer miniatures, and tinker with a homelab."
+    ]
+  },
+  "work": [
+    {
+      "name": "Entelect",
+      "position": "Software Engineer",
+      "url": "https://www.entelect.co.za",
+      "startDate": "2022",
+      "summary": "Software consultancy. Placed with clients as a backend engineer, alongside work on Entelect's own initiatives.",
+      "engagements": [
+        {
+          "name": "Shoprite Financial Services",
+          "type": "Client",
+          "description": "Money Market value-added services",
+          "url": "https://www.shopriteholdings.co.za/group/brands/financial-services-customer-rewards.html",
+          "startDate": "2024",
+          "endDate": "2026",
+          "summary": "Built Kotlin and Spring Boot services for electricity, airtime and data, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, owned the Namibia and Botswana electricity integrations end to end, and helped onboard developers and review code.",
+          "keywords": ["Kotlin", "Spring Boot", "BFF", "Datadog", "WireMock"]
+        },
+        {
+          "name": "Standard Bank",
+          "type": "Client",
+          "description": "Value Added Services",
+          "url": "https://www.standardbank.co.za",
+          "startDate": "2022",
+          "endDate": "2024",
+          "summary": "Developed Java and Spring Boot microservices for product catalogue, quote, order and settlement flows, and contributed to the MNO rewrite for airtime, data, SMS, electricity and lottery products. Migrated Angular front ends to micro-frontends in an Nx monorepo.",
+          "keywords": ["Java", "Spring Boot", "Angular", "Nx", "SonarQube"]
+        },
+        {
+          "name": "Entelect Challenge",
+          "type": "Internal",
+          "description": "Cloud Squad, part-time",
+          "url": "https://challenge.entelect.co.za",
+          "startDate": "2022",
+          "endDate": "2026",
+          "summary": "Maintained the AWS infrastructure behind the competition platform: game engine, website, player portal, forum and submissions. Led the cloud team for a year, owning deployment pipelines and production support.",
+          "keywords": ["AWS", "CI/CD", "Infrastructure"]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "North-West University",
+      "studyType": "BSc Honours",
+      "area": "Computer Science & IT",
+      "startDate": "2021",
+      "endDate": "2021",
+      "summary": "I specialised in Artificial Intelligence, Advanced Databases, Computer Security and Information Systems Engineering (project management of information systems), and my Honours project set out to detect StyleGAN-generated images using convolutional neural networks. Alongside my studies I tutored the undergraduate Computer Networks module (CMPG 315), helping run the practicals, giving feedback on assignments and getting students to grips with Cisco Packet Tracer.",
+      "activities": [{ "date": "2021", "name": "Tutor, Computer Networks (CMPG 315)" }],
+      "link": { "label": "the StyleGAN project", "href": "#stylegan" }
+    },
+    {
+      "institution": "North-West University",
+      "studyType": "BSc",
+      "area": "Information Technology",
+      "startDate": "2017",
+      "endDate": "2020",
+      "summary": "Alongside the degree I served two terms on the RAG Technical Committee. RAG (now JOOL) is one of the biggest charity drives in the Southern Hemisphere, and it was entirely student-run while I was there. The technical committee kept its events safe and helped maintain and develop the RAG Farm, its concert venue.",
+      "activities": [
+        { "date": "2019/20", "name": "RAG Technical Committee" },
+        { "date": "2018/19", "name": "RAG Technical Committee" },
+        { "date": "2017", "name": "De Wilgers men's residence debate team" },
+        { "date": "2017", "name": "De Wilgers men's residence solo singer (enkelsêr)" }
+      ]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "AWS Certified Cloud Practitioner",
+      "issuer": "Amazon Web Services",
+      "date": "2022",
+      "url": "https://www.credly.com/badges/81710cf5-d6bb-4713-aeaf-9b9ba33950d9"
+    },
+    {
+      "name": "Azure Cosmos DB Developer Specialty",
+      "issuer": "Microsoft",
+      "date": "2025",
+      "url": "https://learn.microsoft.com/api/credentials/share/en-us/NeilFoxcroft-0087/CF6074E0DAA1EE3F?sharingId=2E038FCE2265453F"
+    }
+  ],
+  "projects": [
+    {
+      "id": "stylegan",
+      "name": "Identifying StyleGAN faces",
+      "kind": "Honours project · 2021",
+      "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained convolutional neural networks to tell those faces apart from photos of real people, and built a small web app to try the model on an image.",
+      "keywords": ["Deep learning", "CNNs", "Python", "LaTeX"],
+      "url": "https://github.com/neilfoxcroft/StyleGAN-Identification"
+    },
+    {
+      "name": "BLEGO: Braille-like toy blocks",
+      "kind": "Patent · 2017",
+      "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
+      "keywords": ["FIRST LEGO League", "Accessibility"]
+    }
+  ],
+  "places": {
+    "title": "places I've been",
+    "hint": "drag to spin · double-click to reset",
+    "countries": [
+      "South Africa",
+      "Namibia",
+      "United Arab Emirates",
+      "Germany",
+      "Lesotho",
+      "Madagascar",
+      "United States of America"
+    ],
+    "usStates": ["California", "Oregon", "Washington", "New York", "Illinois", "Colorado", "Nevada", "Arizona"]
+  },
+  "pct": {
+    "heading": "Mexico to Canada, on foot",
+    "intro": "In 2026 my fiancée and I thru-hiked the Pacific Crest Trail, from the Mexican border to the Canadian border, through the deserts, the Sierra Nevada and the Cascades. It was a dream we had chased for four years: for us it's indescribable, and for anyone else, unimaginable.",
+    "stats": [
+      { "miles": 2650, "label": "trail length" },
+      { "value": "164", "label": "days on trail" },
+      { "value": "4", "label": "pairs of shoes" },
+      { "value": "3", "label": "states" }
+    ],
+    "moreStats": {
+      "link": "more trail stats",
+      "title": "Trail stats",
+      "intro": "The numbers behind 164 days on the Pacific Crest Trail, from the important to the ridiculous.",
+      "items": [
+        {
+          "metres": 149174.6,
+          "label": "elevation gain",
+          "note": "The whole trail, from Halfmile's GPS survey of the PCT (489,418 ft up)."
+        },
+        {
+          "metres": 148867.7,
+          "label": "elevation loss",
+          "note": "The whole trail, from Halfmile's GPS survey of the PCT (488,411 ft down)."
+        },
+        {
+          "value": "5,700,000",
+          "label": "steps",
+          "guess": true,
+          "note": "Not counted: about 4,265 km at roughly 75 cm a step."
+        },
+        { "value": "30+", "label": "rattlesnakes" },
+        { "value": "7", "label": "bears", "note": "Including 3 cubs and 2 mamas." },
+        { "value": "1", "label": "mountain lion" },
+        {
+          "value": "1,000+",
+          "label": "deer",
+          "guess": true,
+          "note": "NorCal was full of deer, so this number is exaggerated."
+        },
+        { "value": "10+", "label": "mountain goats" },
+        { "value": "1", "label": "pika" },
+        { "value": "18", "label": "trout" },
+        { "value": "2", "label": "snow storms" },
+        { "value": "5", "label": "wildfires" },
+        {
+          "value": "∞",
+          "label": "soda refills",
+          "note": "My trail name was Refill: whenever we were in town, I was always on the free refills that America is famous for."
+        },
+        { "value": "too boku", "label": "climbs" },
+        { "kg": 30, "label": "weight loss" },
+        { "value": "4", "label": "injuries" },
+        { "value": "1", "label": "injurknees" },
+        { "value": "enough", "label": "life-changing moments" }
+      ],
+      "footnote": "Some of these are hard facts. The ones marked ≈ are honest guesstimates, because nothing was really being tracked that extensively."
+    },
+    "photos": [
+      { "section": "Start", "miles": [0], "endsAt": { "place": "Southern Terminus", "lonLat": [-116.467, 32.59] }, "image": "pct-1.jpg", "alt": "Neil at the Southern Terminus monument on the Mexican border, shading his eyes and looking north" },
+      { "section": "Desert", "miles": [0, 702], "endsAt": { "place": "Kennedy Meadows", "lonLat": [-118.131, 36.015] }, "image": "pct-2.jpg", "alt": "Neil hiking towards huge tilted sandstone slabs in the Southern California desert" },
+      { "section": "Sierra", "miles": [702, 1195], "endsAt": { "place": "Sierra City", "lonLat": [-120.636, 39.566] }, "image": "pct-3.jpg", "alt": "Neil on the summit of Mount Whitney, holding up the 14,505 ft summit sign" },
+      { "section": "NorCal", "miles": [1195, 1689], "endsAt": { "place": "Oregon border", "lonLat": [-122.6, 42.0] }, "image": "pct-4.jpg", "alt": "Neil cooling off in a river in Northern California, with a butterfly by his hand" },
+      { "section": "Oregon", "miles": [1689, 2147], "startsAt": "California border", "endsAt": { "place": "Cascade Locks", "lonLat": [-121.897, 45.662] }, "image": "pct-5.jpg", "alt": "Neil hiking through a lava field in Oregon" },
+      { "section": "Washington", "short": "Wash.", "miles": [2147, 2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.802, 49.0] }, "image": "pct-6.jpg", "alt": "Neil's fiancée hiking a steep mountainside trail in Washington, the slope red and gold with autumn colours" },
+      { "section": "End", "miles": [2650], "endsAt": { "place": "Northern Terminus", "lonLat": [-120.787, 49.063] }, "image": "pct-7.jpg", "alt": "Neil and his fiancée at the Northern Terminus monument on the Canadian border" }
+    ]
+  }
+}

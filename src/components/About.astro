@@ -1,0 +1,10 @@
+---
+import SectionLabel from './SectionLabel.astro';
+import resume from '../data/resume.json';
+import { emphasise } from '../lib/format';
+---
+
+<section id="about" aria-label="About" class="flex scroll-mt-24 flex-col gap-4">
+  <SectionLabel text="about" />
+  {resume.basics.about.map((p) => <p class="m-0" set:html={emphasise(p)} />)}
+</section>

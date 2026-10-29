@@ -1,0 +1,20 @@
+---
+// The "// about" style label. On mobile it sticks to the top while you scroll its section
+// (the desktop nav is hidden there, so this keeps you oriented).
+interface Props {
+  text: string;
+  sticky?: boolean;
+}
+
+const { text, sticky = true } = Astro.props;
+---
+
+<h2
+  class:list={[
+    'm-0 text-[0.8rem] font-normal text-muted',
+    sticky &&
+      'sticky top-0 z-10 -mx-5 bg-bg/80 px-5 py-4 backdrop-blur-sm md:-mx-12 md:px-12 lg:static lg:mx-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
+  ]}
+>
+  <span class="text-accent">//</span> {text}
+</h2>

@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+import fontUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = 'Neil Foxcroft — Software Engineer',
+  description = 'Neil Foxcroft is a software engineer building Java and Kotlin Spring Boot services for banking and retail financial services.',
+  noindex = false,
+} = Astro.props;
+
+// Absolute URLs (from `site` in astro.config.mjs): social sites need them for previews.
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og-image.png', Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e1e2e" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Neil Foxcroft" />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Neil Foxcroft" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Neil Foxcroft, Software Engineer" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
+    {
+      /* Visitor stats: GoatCounter (cookie-free, no IP addresses stored), dashboard at foxcroft.goatcounter.com.
+         Only in production builds, so local development never counts as a visit. */
+      import.meta.env.PROD && (
+        <script is:inline data-goatcounter="https://foxcroft.goatcounter.com/count" async src="https://gc.zgo.at/count.js" />
+      )
+    }
+    <script is:inline>
+      // Apply the remembered km/mi and light/dark choices before the page paints, so nothing flashes.
+      try {
+        if (localStorage.getItem('units') === 'imperial') document.documentElement.dataset.units = 'imperial';
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+          document.querySelector('meta[name="theme-color"]').content = '#eff1f5';
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

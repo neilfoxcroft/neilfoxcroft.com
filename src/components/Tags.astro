@@ -1,0 +1,15 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="mt-1 flex flex-wrap gap-2" aria-label="Technologies">
+  {
+    items.map((t) => (
+      <li class="rounded-full bg-accent/12 px-2.5 py-1 text-[0.75rem] leading-normal text-accent">{t}</li>
+    ))
+  }
+</ul>

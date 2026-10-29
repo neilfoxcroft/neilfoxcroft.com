@@ -1,0 +1,213 @@
+---
+import { buildPctMap, WIDTH, HEIGHT } from '../lib/pct-map';
+import UnitToggle from './UnitToggle.astro';
+
+// All projection maths happens here at build time; the browser just gets the SVG.
+const map = buildPctMap();
+---
+
+{/*
+  The map is an SVG laid on a tilted plane: CSS perspective on the wrapper, then rotateX/rotateZ on the
+  plane, with a darker slab pushed 18px behind it for depth. The tilt is gentler on phones.
+  The negative margins take back the empty space the tilt leaves above and below.
+  The route is drawn white. Moving the mouse anywhere over the map (or tapping it) colours it PCT teal from
+  Campo up to the point on the trail nearest the cursor, and it stays coloured after the mouse leaves.
+  data-samples holds evenly spaced points along the route; the script finds the nearest one and sets --done
+  (0 to 1), which drives the coloured line's dash offset. Everything inside the SVG ignores the pointer, so the
+  SVG itself gets every event and offsetX/offsetY are already mapped back through the 3D tilt by the browser.
+*/}
+<div class="relative flex min-w-0 flex-col items-center gap-2">
+  {/* km / mi switch: top-right corner of the map area; on phones it sits on its own line above the map. */}
+  <div class="z-10 mb-2 self-end md:absolute md:top-0 md:right-0 md:mb-0">
+    <UnitToggle />
+  </div>
+  <div id="pct-map" data-pct-map class="theme-dark flex w-full justify-center perspective-[1600px]">
+    <div
+      data-pct-plane
+      class="relative w-[80%] max-w-[380px] transform-3d transition-transform duration-300 ease-out [--hx:0] [--hy:0] -mt-[28px] [transform:translateX(-10px)_rotateX(35deg)_rotateZ(-8deg)] motion-reduce:transition-none md:mt-[-84px] md:w-[68%] md:mb-[-24px] md:[transform:translateX(-26px)_rotateY(calc(var(--hx)*6deg))_rotateX(calc(50deg_-_var(--hy)*6deg))_rotateZ(-22deg)]"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 rounded-[18px] bg-crust shadow-[0_40px_80px_rgb(0_0_0/0.55)] [transform:translateZ(-18px)]"
+      >
+      </div>
+      <svg
+        role="img"
+        aria-labelledby="pct-map-title"
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        data-samples={JSON.stringify(map.samples)}
+        class="relative block h-auto w-full cursor-crosshair touch-none rounded-[18px] border border-line bg-mantle [&_*]:pointer-events-none"
+      >
+        <title id="pct-map-title">
+          Map of the Pacific Crest Trail, running about 4,200 km from the Mexican border in California north
+          through Oregon and Washington to the Canadian border.
+        </title>
+        <path d={map.graticule} fill="none" stroke="#313244" stroke-width="1" opacity="0.6"></path>
+
+        <g fill="#24273a" stroke="#45475a" stroke-width="1.5" stroke-linejoin="round">
+          {map.countries.map((d) => <path d={d} />)}
+          {map.contextStates.map((d) => <path d={d} />)}
+        </g>
+        <g fill="#313244" stroke="#6c7086" stroke-width="2" stroke-linejoin="round">
+          {map.trailStates.map((d) => <path d={d} />)}
+        </g>
+
+        <g font-family="JetBrains Mono Variable, monospace" font-weight="600" text-anchor="middle" pointer-events="none">
+          {
+            map.stateLabels.map((l) => (
+              <text x={l.x} y={l.y} font-size="22" letter-spacing="1.5" fill="#bac2de">
+                {l.text}
+              </text>
+            ))
+          }
+          {
+            map.countryLabels.map((l) => (
+              <text x={l.x} y={l.y} font-size={l.size} letter-spacing="3" fill="#a6adc8">
+                {l.text}
+              </text>
+            ))
+          }
+          <text
+            x={map.ocean.x}
+            y={map.ocean.y}
+            font-size="22"
+            letter-spacing="3"
+            fill="#7f849c"
+            transform={`rotate(-90 ${map.ocean.x} ${map.ocean.y})`}
+          >
+            PACIFIC OCEAN
+          </text>
+        </g>
+
+        {/*
+          The trail and its glows. Glows are a couple of wider translucent strokes rather than a blur filter:
+          they look much the same but are far cheaper to redraw while the colouring follows the pointer.
+        */}
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="12" opacity="0.05"></path>
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="7" opacity="0.1"></path>
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="3.5"></path>
+          {/* Map hover / drag colouring: Campo up to the pointer (--done, 0 to 1). */}
+          <g data-pct-done stroke="#038285" class="[--done:0] [stroke-dashoffset:calc(1_-_var(--done))]">
+            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
+            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
+            <path d={map.trail} stroke-width="4.5" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
+          </g>
+          {/*
+            Section highlight (driven by the photo strip): shows only the slice of the route from --sec-from to
+            --sec-from + --sec-len (0 to 1), in --sec-color, and "fills up" by animating --sec-len. See global.css.
+          */}
+          <g data-pct-section class="pct-section">
+            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1"></path>
+            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1"></path>
+            <path d={map.trail} stroke-width="4.5" pathLength="1"></path>
+          </g>
+        </g>
+
+        <circle
+          data-pct-start
+          cx={map.start.x}
+          cy={map.start.y}
+          r="8"
+          fill="#1e1e2e"
+          stroke="#cdd6f4"
+          stroke-width="3"
+          pointer-events="none"></circle>
+        <circle
+          data-pct-end
+          cx={map.end.x}
+          cy={map.end.y}
+          r="8"
+          fill="#1e1e2e"
+          stroke="#cdd6f4"
+          stroke-width="3"
+          pointer-events="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <p class="m-0 text-[0.8rem] text-faint">
+    trail data <a
+      href="https://www.openstreetmap.org/copyright"
+      target="_blank"
+      rel="noopener"
+      class="text-faint decoration-line hover:text-accent">{map.attribution}</a
+    >{' · '}elevation NASA SRTM
+  </p>
+</div>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const map = document.querySelector<HTMLElement>('[data-pct-map]');
+  const plane = map?.querySelector<HTMLElement>('[data-pct-plane]');
+  const done = map?.querySelector<SVGGElement>('[data-pct-done]');
+  const svg = map?.querySelector<SVGSVGElement>('svg[data-samples]');
+  const samples: number[] = JSON.parse(svg?.dataset.samples ?? '[]');
+  const viewBox = svg?.viewBox.baseVal;
+
+  // Colour the route from Campo up to the trail point nearest the pointer, and tell the elevation profile
+  // (pct:map-trace, 0–1 along the route) so its marker follows.
+  function colourTo(e: PointerEvent) {
+    if (!svg || !done || !viewBox || samples.length < 4) return;
+    // Only one highlight shows at a time: the photo strip drops an unpinned section, or cancels this event
+    // to keep a pinned one (then the map leaves its own colouring alone).
+    if (!document.dispatchEvent(new CustomEvent('pct:map-pointer', { cancelable: true }))) return;
+    // offsetX/Y are in the SVG's own (untilted) CSS pixels; scale them to viewBox units.
+    const x = (e.offsetX * viewBox.width) / svg.clientWidth;
+    const y = (e.offsetY * viewBox.height) / svg.clientHeight;
+    let best = 0;
+    let bestD = Infinity;
+    for (let i = 0; i < samples.length; i += 2) {
+      const d = (samples[i] - x) ** 2 + (samples[i + 1] - y) ** 2;
+      if (d < bestD) [bestD, best] = [d, i / 2];
+    }
+    const f = best / (samples.length / 2 - 1);
+    done.style.setProperty('--done', f.toFixed(4));
+    document.dispatchEvent(new CustomEvent('pct:map-trace', { detail: f }));
+  }
+
+  // Pointer moves can fire several times per frame; only handle the latest one, once per frame.
+  let pendingMove: PointerEvent | undefined;
+  const onMove = (e: PointerEvent) => {
+    if (!pendingMove) {
+      requestAnimationFrame(() => {
+        if (pendingMove) colourTo(pendingMove);
+        pendingMove = undefined;
+      });
+    }
+    pendingMove = e;
+  };
+
+  if (map && plane && svg) {
+    svg.addEventListener('pointermove', onMove);
+    // Pressing on the map (finger or mouse) counts as clicking elsewhere: it unpins any pinned photo section.
+    // On touch the SVG has touch-action: none, so a finger dragged across the map traces the trail instead
+    // of scrolling the page; swipes that start anywhere else still scroll.
+    svg.addEventListener('pointerdown', (e) => {
+      document.dispatchEvent(new CustomEvent('pct:map-press'));
+      colourTo(e);
+    });
+
+    // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
+    // data-hover stops the idle drift (global.css) while the cursor is in charge.
+    map.addEventListener('pointermove', (e) => {
+      if (!finePointer.matches || reduceMotion.matches) return;
+      const box = map.getBoundingClientRect();
+      plane.toggleAttribute('data-hover', true);
+      plane.style.setProperty('--hx', (((e.clientX - box.left) / box.width) * 2 - 1).toFixed(3));
+      plane.style.setProperty('--hy', (((e.clientY - box.top) / box.height) * 2 - 1).toFixed(3));
+    });
+    // Leaving the map levels the tilt and hands back to the idle drift; the coloured trail stays where it was.
+    map.addEventListener('pointerleave', () => {
+      plane.removeAttribute('data-hover');
+      plane.style.setProperty('--hx', '0');
+      plane.style.setProperty('--hy', '0');
+      document.dispatchEvent(new CustomEvent('pct:map-leave'));
+    });
+    // Pause the idle drift while the map is off screen.
+    new IntersectionObserver(([entry]) => plane.toggleAttribute('data-offscreen', !entry.isIntersecting)).observe(map);
+  }
+</script>

@@ -1,0 +1,94 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import About from '../components/About.astro';
+import Experience from '../components/Experience.astro';
+import Education from '../components/Education.astro';
+import Projects from '../components/Projects.astro';
+import Pct from '../components/Pct.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base>
+  <a
+    href="#content"
+    class="fixed top-4 left-4 z-50 -translate-y-24 rounded-md bg-accent px-4 py-2 font-semibold text-bg focus:translate-y-0 focus:text-bg"
+  >
+    Skip to content
+  </a>
+  {/*
+    Cursor spotlight: a faint accent glow that follows the mouse (see .spotlight in global.css). Hidden until the
+    mouse moves. It sits above the page (it can't be clicked) so the sticky section labels' backgrounds below
+    1024px don't cut a dark block out of it.
+  */}
+  <div
+    aria-hidden="true"
+    data-spotlight
+    class="spotlight pointer-events-none fixed inset-0 z-30 opacity-0 transition-opacity duration-500 [--mx:50vw] [--my:50vh]"
+  >
+  </div>
+  <div
+    class="relative mx-auto max-w-[1180px] px-5 py-14 md:px-12 md:py-20 lg:flex lg:justify-between lg:gap-16 lg:py-0"
+  >
+    <Header />
+    <main id="content" class="mt-16 flex min-w-0 flex-col gap-16 md:gap-24 lg:mt-0 lg:flex-1 lg:py-24">
+      <About />
+      <Experience />
+      <Education />
+      <Projects />
+      <Pct />
+    </main>
+  </div>
+  <Footer />
+</Base>
+
+<script>
+  // Scroll-spy: highlight the nav item for the section currently near the top of the screen.
+  const ids = ['about', 'experience', 'projects', 'pct'];
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-nav]');
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    const line = window.innerHeight * 0.4;
+    let active = ids[0];
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < line) active = id;
+    }
+    // At the very bottom the last section may never reach the line, so force it.
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      active = ids[ids.length - 1];
+    }
+    links.forEach((a) => a.setAttribute('aria-current', String(a.dataset.nav === active)));
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+
+  // Spotlight follows the mouse; skipped on touch screens and with "reduce motion" on.
+  const spotlight = document.querySelector<HTMLElement>('[data-spotlight]');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  window.addEventListener(
+    'pointermove',
+    (e) => {
+      if (!spotlight || !finePointer.matches || reduceMotion.matches) return;
+      spotlight.style.setProperty('--mx', `${e.clientX}px`);
+      spotlight.style.setProperty('--my', `${e.clientY}px`);
+      spotlight.style.opacity = '1';
+    },
+    { passive: true },
+  );
+  document.documentElement.addEventListener('pointerleave', () => {
+    if (spotlight) spotlight.style.opacity = '0';
+  });
+</script>
