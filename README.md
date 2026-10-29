@@ -36,13 +36,13 @@ Change the file and the page updates; no component changes needed. The résumé 
 
 ### PCT photos
 
-There's one photo slot per trail section (Start, Desert, Sierra, NorCal, Oregon, Washington) in `pct.photos`. To fill one:
+There's one photo slot per trail section (Start, Desert, Sierra, NorCal, Oregon, Washington, End) in `pct.photos`, shown as a strip of square thumbnails under the map. To fill one:
 
 1. Put the photo in `src/assets/pct/` (full-size JPG/PNG/WebP is fine; the build resizes it to WebP at several sizes).
 2. Set that slot's `image` to the filename and `alt` to a short description, e.g.
    `"image": "desert.jpg", "alt": "Sunset over the Mojave near mile 500"`.
 
-Hovering a photo colours the map's route up to where that section ends (`endsAt`, a real place pinned to the trail), and clicking it opens the photo full size. Slots without an image show a dashed placeholder. A misspelt filename fails the build with a clear message.
+Hovering a photo colours the map's route up to where that section ends (`endsAt`, a real place pinned to the trail), and clicking it opens the photo full size. Slots without an image show a dashed placeholder. An optional `short` name (e.g. `"Wash."`) is used when the thumbnails get narrow. A misspelt filename fails the build with a clear message.
 
 If you change the name, title or pitch, regenerate the social-share image and icons:
 

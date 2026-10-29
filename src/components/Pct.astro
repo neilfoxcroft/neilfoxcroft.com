@@ -14,13 +14,21 @@ const photoFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/pct/*
   eager: true,
 });
 const { fractionAtPlace } = buildPctMap();
-const photos = pct.photos.map((ph) => {
+const photos = pct.photos.map((ph, i) => {
   const file = ph.image as string | null;
   const src = file ? photoFiles[`../assets/pct/${file}`]?.default : undefined;
   if (file && !src) throw new Error(`PCT photo "${file}" not found in src/assets/pct/`);
-  // How much of the map's route to colour when this photo is hovered: up to where its section ends.
-  return { ...ph, src, f: fractionAtPlace(ph.endsAt.lonLat as [number, number]) };
+  const prev = pct.photos[i - 1];
+  return {
+    ...ph,
+    src,
+    // How much of the map's route to colour when this photo is hovered: up to where its section ends.
+    f: fractionAtPlace(ph.endsAt.lonLat as [number, number]),
+    // Shown in the line under the strip, e.g. "Desert · mi 0–702 · Campo → Kennedy Meadows".
+    route: prev ? `${prev.endsAt.place} → ${ph.endsAt.place}` : `Southern Terminus, ${ph.endsAt.place}`,
+  };
 });
+const readoutHint = 'Point at a photo to trace its section on the map';
 ---
 
 <section id="pct" aria-label="Pacific Crest Trail" class="flex scroll-mt-24 flex-col gap-6">
@@ -30,110 +38,140 @@ const photos = pct.photos.map((ph) => {
     <p class="m-0 max-w-[40rem]">{pct.intro}</p>
   </div>
 
-  <div class="flex flex-col gap-8">
-    <PctMap />
-
-    <div class="flex flex-col gap-6">
-      <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-        {
-          pct.stats.map((s) => (
-            <div class="flex flex-col-reverse">
-              <dt class="text-[0.8rem] text-muted">{s.label}</dt>
-              <dd class="m-0 text-[1.6rem] leading-tight font-bold whitespace-nowrap text-accent">{s.value}</dd>
-            </div>
-          ))
-        }
-      </dl>
-      {/* Becomes a link once there's a journal URL in resume.json. */}
-      <p class="m-0 font-semibold text-muted">
-        {pct.journal.label} <span aria-hidden="true" class="text-accent">↗</span>
-      </p>
-    </div>
-  </div>
+  <PctMap />
 
   {/*
-    One photo per trail section, in order from Campo north: 3×2 on desktop, 2×3 on phones.
-    Hovering (or tapping) a photo colours the map's route up to the end of that section (data-f).
-    Clicking a photo opens it full size in a <dialog>; Esc, ✕ or a click outside closes it.
+    Photo strip, directly under the map so both are on screen together: one photo per section, Campo north.
+    Hovering, tapping or focusing a photo colours the map's route up to where that section ends (data-f) and
+    fills in the readout line below. Clicking a photo opens it full size in a <dialog>.
+    Seven fit in one row on wide screens; on narrower ones the strip scrolls sideways.
   */}
-  <ul class="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3">
-    {
-      photos.map((ph, i) => (
-        <li data-pct-photo data-f={ph.f}>
-          <figure class="group m-0 flex flex-col gap-1.5">
-            {ph.src ? (
-              <button
-                type="button"
-                data-photo-open={i}
-                aria-haspopup="dialog"
-                aria-label={`Enlarge photo: ${ph.section}`}
-                class="block cursor-zoom-in overflow-hidden rounded-[10px] border border-line transition-colors hover:border-line-strong"
-              >
-                <Image
-                  src={ph.src}
-                  alt={ph.alt}
-                  widths={[320, 480, 720]}
-                  sizes="(min-width: 640px) 200px, 50vw"
-                  class="block aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.04] motion-reduce:transition-none"
-                />
-              </button>
-            ) : (
-              <div class="flex aspect-[4/3] items-center justify-center rounded-[10px] border border-dashed border-line-strong text-[0.75rem] text-muted transition-colors group-hover:border-muted">
-                [photo]
-              </div>
-            )}
-            <figcaption class="flex flex-col text-[0.8rem] leading-snug">
-              <span class="text-text transition-colors group-hover:text-heading">
-                <span class="text-accent">//</span> {ph.section}
-              </span>
-              <span class="text-muted">{ph.miles}</span>
-            </figcaption>
-          </figure>
+  <div class="flex flex-col gap-2">
+    <ul
+      class="-mx-5 m-0 flex list-none gap-2 overflow-x-auto px-5 pt-1 pb-2 [scrollbar-width:thin] snap-x snap-mandatory md:mx-0 md:px-0"
+    >
+      {
+        photos.map((ph, i) => (
+          <li
+            data-pct-photo
+            data-f={ph.f}
+            data-readout={`${ph.section} · ${ph.miles} · ${ph.route}`}
+            class="group @container w-[5.5rem] shrink-0 snap-start sm:w-auto sm:min-w-[3.5rem] sm:flex-1"
+          >
+            <figure class="m-0 flex flex-col gap-1">
+              {ph.src ? (
+                <button
+                  type="button"
+                  data-photo-open={i}
+                  aria-haspopup="dialog"
+                  aria-label={`Enlarge photo: ${ph.section}, ${ph.miles}`}
+                  class="block cursor-zoom-in overflow-hidden rounded-lg border border-line transition-colors group-hover:border-accent group-data-active:border-accent"
+                >
+                  <Image
+                    src={ph.src}
+                    alt={ph.alt}
+                    widths={[160, 240, 360]}
+                    sizes="90px"
+                    class="block aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.06] motion-reduce:transition-none"
+                  />
+                </button>
+              ) : (
+                <div
+                  tabindex="0"
+                  aria-label={`${ph.section}, ${ph.miles}: photo to come`}
+                  class="flex aspect-square items-center justify-center rounded-lg border border-dashed border-line-strong text-[0.8rem] text-muted transition-colors group-hover:border-accent group-data-active:border-accent"
+                >
+                  +
+                </div>
+              )}
+              {/* Narrow tiles (container query) show the short name, e.g. "Wash."; the readout has the full one. */}
+              <figcaption class="truncate text-center text-[0.8rem] text-muted transition-colors group-hover:text-heading group-data-active:text-heading">
+                {'short' in ph && ph.short ? (
+                  <>
+                    <span class="hidden @[4.875rem]:inline">{ph.section}</span>
+                    <span class="@[4.875rem]:hidden">{ph.short}</span>
+                  </>
+                ) : (
+                  ph.section
+                )}
+              </figcaption>
+            </figure>
 
-          {ph.src && (
-            <dialog
-              data-photo-dialog={i}
-              aria-label={`${ph.section}, ${ph.miles}`}
-              class="m-auto max-h-[calc(100dvh-2rem)] w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
-            >
-              <figure class="m-0 flex flex-col">
-                <Image
-                  src={ph.src}
-                  alt={ph.alt}
-                  widths={[960, 1600, 2400]}
-                  sizes="90vw"
-                  class="block h-auto max-h-[calc(100dvh-7rem)] w-full bg-crust object-contain"
-                />
-                <figcaption class="flex items-center justify-between gap-4 px-5 py-2 text-[0.8rem]">
-                  <span>
-                    <span class="text-accent">//</span> {ph.section} <span class="text-muted">· {ph.miles}</span>
-                  </span>
-                  <button
-                    type="button"
-                    data-photo-close
-                    aria-label="Close"
-                    class="-mr-3 flex size-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:text-accent"
-                  >
-                    ✕
-                  </button>
-                </figcaption>
-              </figure>
-            </dialog>
-          )}
-        </li>
-      ))
-    }
-  </ul>
+            {ph.src && (
+              <dialog
+                data-photo-dialog={i}
+                aria-label={`${ph.section}, ${ph.miles}`}
+                class="m-auto max-h-[calc(100dvh-2rem)] w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
+              >
+                <figure class="m-0 flex flex-col">
+                  <Image
+                    src={ph.src}
+                    alt={ph.alt}
+                    widths={[960, 1600, 2400]}
+                    sizes="90vw"
+                    class="block h-auto max-h-[calc(100dvh-7rem)] w-full bg-crust object-contain"
+                  />
+                  <figcaption class="flex items-center justify-between gap-4 px-5 py-2 text-[0.8rem]">
+                    <span>
+                      <span class="text-accent">//</span> {ph.section}{' '}
+                      <span class="text-muted">
+                        · {ph.miles} · {ph.route}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      data-photo-close
+                      aria-label="Close"
+                      class="-mr-3 flex size-[44px] shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:text-accent"
+                    >
+                      ✕
+                    </button>
+                  </figcaption>
+                </figure>
+              </dialog>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    <p data-pct-readout aria-live="polite" class="m-0 min-h-[1.7em] text-[0.8rem] text-muted">
+      <span class="text-accent">//</span> <span data-pct-readout-text>{readoutHint}</span>
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-6">
+    <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+      {
+        pct.stats.map((s) => (
+          <div class="flex flex-col-reverse">
+            <dt class="text-[0.8rem] text-muted">{s.label}</dt>
+            <dd class="m-0 text-[1.6rem] leading-tight font-bold whitespace-nowrap text-accent">{s.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    {/* Becomes a link once there's a journal URL in resume.json. */}
+    <p class="m-0 font-semibold text-muted">
+      {pct.journal.label} <span aria-hidden="true" class="text-accent">↗</span>
+    </p>
+  </div>
 </section>
 
 <script>
-  // Hovering or tapping a photo colours the map's route up to the end of that photo's section.
+  // Hovering, tapping or focusing a photo colours the map's route up to the end of that photo's section,
+  // marks the photo as active and shows its details in the readout line.
   const done = document.querySelector<SVGGElement>('[data-pct-done]');
-  document.querySelectorAll<HTMLElement>('[data-pct-photo]').forEach((tile) => {
-    const colour = () => done?.style.setProperty('--done', tile.dataset.f ?? '0');
-    tile.addEventListener('pointerenter', colour);
-    tile.addEventListener('pointerdown', colour);
-    tile.addEventListener('focusin', colour);
+  const readout = document.querySelector<HTMLElement>('[data-pct-readout-text]');
+  const tiles = document.querySelectorAll<HTMLElement>('[data-pct-photo]');
+  tiles.forEach((tile) => {
+    const select = () => {
+      done?.style.setProperty('--done', tile.dataset.f ?? '0');
+      tiles.forEach((t) => t.toggleAttribute('data-active', t === tile));
+      if (readout) readout.textContent = tile.dataset.readout ?? '';
+    };
+    tile.addEventListener('pointerenter', select);
+    tile.addEventListener('pointerdown', select);
+    tile.addEventListener('focusin', select);
   });
 
   // Click a photo to see it full size.

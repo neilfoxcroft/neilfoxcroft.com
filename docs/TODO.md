@@ -13,7 +13,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
   - [x] days on trail (164: 14 Apr – 24 Sep 2026) and pairs of shoes (4), added 2026-10-29
   - the intro story (bracketed text in `pct.intro`)
   - trail journal link (`pct.journal`; it becomes a real link once it has a URL)
-  - six photos, one per section (2026-10-29): Start, Desert, Sierra, NorCal, Oregon, Washington. Drop each in `src/assets/pct/` and set `pct.photos[].image` and `alt` in resume.json (see README → PCT photos). Hover-to-map and click-to-enlarge are already built.
+  - seven photos, one per section (2026-10-29): Start, Desert, Sierra, NorCal, Oregon, Washington, End. Drop each in `src/assets/pct/` and set `pct.photos[].image` and `alt` in resume.json (see README → PCT photos). Hover-to-map and click-to-enlarge are already built.
 
 ## Features to consider
 
