@@ -127,8 +127,8 @@
     "stats": [
       { "value": "4,265 km", "label": "trail length" },
       { "value": "3", "label": "states" },
-      { "value": "[__]", "label": "days on trail" },
-      { "value": "[__]", "label": "pairs of shoes" }
+      { "value": "164", "label": "days on trail" },
+      { "value": "4", "label": "pairs of shoes" }
     ],
     "journal": { "label": "[Read the trail journal]" },
     "photos": [

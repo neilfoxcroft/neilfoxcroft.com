@@ -10,7 +10,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - [ ] **Homelab write-up** project: replace the `[Homelab write-up]` placeholder in `projects` (the self-hosted stack, the hardware, how it's deployed and managed).
 - [ ] **Public backend project**: replace the `[Public backend project]` placeholder in `projects` (a small Spring Boot or Kotlin service with Terraform).
 - [ ] **PCT extras** in `pct`:
-  - days on trail and pairs of shoes (currently `[__]`)
+  - [x] days on trail (164: 14 Apr – 24 Sep 2026) and pairs of shoes (4), added 2026-10-29
   - the intro story (bracketed text in `pct.intro`)
   - trail journal link (`pct.journal`; it becomes a real link once it has a URL)
   - six photos, one per section (2026-10-29): Start, Desert, Sierra, NorCal, Oregon, Washington. Drop each in `src/assets/pct/` and set `pct.photos[].image` and `alt` in resume.json (see README → PCT photos). Hover-to-map and click-to-enlarge are already built.
