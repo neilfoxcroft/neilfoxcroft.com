@@ -104,17 +104,44 @@ const map = buildPctMap();
             <path d={map.trail} stroke-width="4.5" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
             ></path>
           </g>
+          {/*
+            Section highlight (driven by the photo strip): shows only the slice of the route from --sec-from to
+            --sec-from + --sec-len (0 to 1), in --sec-color, and "fills up" by animating --sec-len. See global.css.
+          */}
+          <g data-pct-section class="pct-section">
+            <path d={map.trail} stroke-width="10" opacity="0.6" filter="url(#pct-glow)" pathLength="1"></path>
+            <path d={map.trail} stroke-width="4.5" pathLength="1"></path>
+          </g>
         </g>
 
-        <circle cx={map.start.x} cy={map.start.y} r="8" fill="#1e1e2e" stroke="#cdd6f4" stroke-width="3" pointer-events="none"
-        ></circle>
-        <circle cx={map.end.x} cy={map.end.y} r="8" fill="#cdd6f4" stroke="#1e1e2e" stroke-width="3" pointer-events="none"
-        ></circle>
+        <circle
+          data-pct-start
+          cx={map.start.x}
+          cy={map.start.y}
+          r="8"
+          fill="#1e1e2e"
+          stroke="#cdd6f4"
+          stroke-width="3"
+          pointer-events="none"></circle>
+        <circle
+          data-pct-end
+          cx={map.end.x}
+          cy={map.end.y}
+          r="8"
+          fill="#1e1e2e"
+          stroke="#cdd6f4"
+          stroke-width="3"
+          pointer-events="none"></circle>
       </svg>
     </div>
   </div>
-  <p class="m-0 text-[0.8rem] text-muted">
-    Trail data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">{map.attribution}</a>
+  <p class="m-0 text-[0.8rem] text-[#8188a1]">
+    trail data <a
+      href="https://www.openstreetmap.org/copyright"
+      target="_blank"
+      rel="noopener"
+      class="text-[#8188a1] decoration-line hover:text-accent">{map.attribution}</a
+    >
   </p>
 </div>
 
@@ -131,6 +158,9 @@ const map = buildPctMap();
   // Colour the route from Campo up to the trail point nearest the pointer.
   function colourTo(e: PointerEvent) {
     if (!svg || !done || !viewBox || samples.length < 4) return;
+    // Only one highlight shows at a time: the photo strip drops an unpinned section, or cancels this event
+    // to keep a pinned one (then the map leaves its own colouring alone).
+    if (!document.dispatchEvent(new CustomEvent('pct:map-pointer', { cancelable: true }))) return;
     // offsetX/Y are in the SVG's own (untilted) CSS pixels; scale them to viewBox units.
     const x = (e.offsetX * viewBox.width) / svg.clientWidth;
     const y = (e.offsetY * viewBox.height) / svg.clientHeight;

@@ -15,6 +15,9 @@ const photoFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/pct/*
   eager: true,
 });
 const { fractionAtPlace } = buildPctMap();
+// One colour per section (Catppuccin Mocha), distinct from the white trail; End uses the PCT logo teal.
+const sectionColours = ['#f38ba8', '#fab387', '#89dceb', '#a6e3a1', '#f9e2af', '#cba6f7', '#038285'];
+const ends = pct.photos.map((ph) => fractionAtPlace(ph.endsAt.lonLat as [number, number]));
 const photos = pct.photos.map((ph, i) => {
   const file = ph.image as string | null;
   const src = file ? photoFiles[`../assets/pct/${file}`]?.default : undefined;
@@ -23,8 +26,11 @@ const photos = pct.photos.map((ph, i) => {
   return {
     ...ph,
     src,
-    // How much of the map's route to colour when this photo is hovered: up to where its section ends.
-    f: fractionAtPlace(ph.endsAt.lonLat as [number, number]),
+    // The slice of the map's route (0–1) this section covers: from the previous section's end to its own.
+    // Start is the point at Campo (0–0); End is the whole trail.
+    from: i === pct.photos.length - 1 ? 0 : (ends[i - 1] ?? 0),
+    to: ends[i],
+    colour: sectionColours[i % sectionColours.length],
     route: prev ? `${prev.endsAt.place} → ${ph.endsAt.place}` : `Southern Terminus, ${ph.endsAt.place}`,
     // Section distance in both units; the km/mi switch decides which is shown.
     dist: { metric: distanceRange(ph.miles, 'metric'), imperial: distanceRange(ph.miles, 'imperial') },
@@ -44,8 +50,10 @@ const readoutHint = 'Point at a photo to trace its section on the map';
 
   {/*
     Photo strip, directly under the map so both are on screen together: one photo per section, Campo north.
-    Hovering, tapping or focusing a photo colours the map's route up to where that section ends (data-f) and
-    fills in the readout line below. Clicking a photo opens it full size in a <dialog>.
+    Hovering, tapping or focusing a photo selects it: the map lights up just that section of the route in the
+    section's colour (filling up from its start to its end), and the readout line below shows its details.
+    The selection stays until another photo is selected or you click anywhere else on the page.
+    Clicking a photo opens it full size in a <dialog>.
     Seven fit in one row on wide screens; on narrower ones the strip scrolls sideways.
   */}
   <div class="flex flex-col gap-2">
@@ -56,7 +64,10 @@ const readoutHint = 'Point at a photo to trace its section on the map';
         photos.map((ph, i) => (
           <li
             data-pct-photo
-            data-f={ph.f}
+            data-from={ph.from}
+            data-to={ph.to}
+            data-colour={ph.colour}
+            style={`--c: ${ph.colour}`}
             data-readout-metric={`${ph.section} · ${ph.dist.metric} · ${ph.route}`}
             data-readout-imperial={`${ph.section} · ${ph.dist.imperial} · ${ph.route}`}
             class="group @container w-[5.5rem] shrink-0 snap-start sm:w-auto sm:min-w-[3.5rem] sm:flex-1"
@@ -68,7 +79,7 @@ const readoutHint = 'Point at a photo to trace its section on the map';
                   data-photo-open={i}
                   aria-haspopup="dialog"
                   aria-label={`Enlarge photo: ${ph.section}`}
-                  class="block cursor-zoom-in overflow-hidden rounded-lg border border-line transition-colors group-hover:border-accent group-data-active:border-accent"
+                  class="block cursor-zoom-in overflow-hidden rounded-lg border border-line transition-colors group-hover:border-(--c) group-data-active:border-(--c)"
                 >
                   <Image
                     src={ph.src}
@@ -82,13 +93,13 @@ const readoutHint = 'Point at a photo to trace its section on the map';
                 <div
                   tabindex="0"
                   aria-label={`${ph.section}: photo to come`}
-                  class="flex aspect-square items-center justify-center rounded-lg border border-dashed border-line-strong text-[0.8rem] text-muted transition-colors group-hover:border-accent group-data-active:border-accent"
+                  class="flex aspect-square items-center justify-center rounded-lg border border-dashed border-line-strong text-[0.8rem] text-muted transition-colors group-hover:border-(--c) group-hover:text-(--c) group-data-active:border-solid group-data-active:border-(--c) group-data-active:text-(--c)"
                 >
                   +
                 </div>
               )}
               {/* Narrow tiles (container query) show the short name, e.g. "Wash."; the readout has the full one. */}
-              <figcaption class="truncate text-center text-[0.8rem] text-muted transition-colors group-hover:text-heading group-data-active:text-heading">
+              <figcaption class="truncate text-center text-[0.8rem] text-muted transition-colors group-hover:text-heading group-data-active:text-(--c)">
                 {'short' in ph && ph.short ? (
                   <>
                     <span class="hidden @[4.875rem]:inline">{ph.section}</span>
@@ -139,7 +150,7 @@ const readoutHint = 'Point at a photo to trace its section on the map';
       }
     </ul>
     <p data-pct-readout aria-live="polite" class="m-0 min-h-[1.7em] text-[0.8rem] text-muted">
-      <span class="text-accent">//</span> <span data-pct-readout-text>{readoutHint}</span>
+      <span data-pct-readout-mark class="text-accent transition-colors">//</span> <span data-pct-readout-text>{readoutHint}</span>
     </p>
   </div>
 
@@ -171,28 +182,116 @@ const readoutHint = 'Point at a photo to trace its section on the map';
 </section>
 
 <script>
-  // Hovering, tapping or focusing a photo colours the map's route up to the end of that photo's section,
-  // marks the photo as active and shows its details in the readout line.
+  // Selecting a photo lights up just that section of the map in its colour, filling up from the section's
+  // start to its end, and shows its details in the readout.
+  // - Hover or keyboard focus selects a photo, unless one is pinned.
+  // - A click or tap pins it: hovering other photos (or the map) then leaves it alone. Clicking another photo
+  //   pins that one; clicking anywhere else on the page unpins and clears.
+  // - With nothing pinned, hovering the map switches back to its own Campo-to-cursor colouring.
   const done = document.querySelector<SVGGElement>('[data-pct-done]');
+  const section = document.querySelector<SVGGElement>('[data-pct-section]');
+  const startMarker = document.querySelector<SVGCircleElement>('[data-pct-start]');
+  const endMarker = document.querySelector<SVGCircleElement>('[data-pct-end]');
   const readout = document.querySelector<HTMLElement>('[data-pct-readout-text]');
+  const readoutMark = document.querySelector<HTMLElement>('[data-pct-readout-mark]');
+  const hint = readout?.textContent ?? '';
   const tiles = document.querySelectorAll<HTMLElement>('[data-pct-photo]');
   let active: HTMLElement | undefined;
+  let pinned: HTMLElement | undefined;
+  let endTimer: number | undefined;
+
   const showReadout = () => {
-    if (!readout || !active) return;
+    if (!readout) return;
+    if (!active) {
+      readout.textContent = hint;
+      return;
+    }
     const imperial = document.documentElement.dataset.units === 'imperial';
     readout.textContent = (imperial ? active.dataset.readoutImperial : active.dataset.readoutMetric) ?? '';
   };
-  document.addEventListener('unitschange', showReadout);
+
+  const resetMarkers = () => {
+    window.clearTimeout(endTimer);
+    startMarker?.removeAttribute('data-highlight');
+    startMarker?.removeAttribute('data-tint');
+    endMarker?.removeAttribute('data-tint');
+  };
+
+  const clear = () => {
+    pinned = undefined;
+    if (!active) return;
+    active = undefined;
+    tiles.forEach((t) => t.removeAttribute('data-active'));
+    section?.removeAttribute('data-active');
+    resetMarkers();
+    if (readoutMark) readoutMark.style.color = '';
+    showReadout();
+  };
+
+  const select = (tile: HTMLElement) => {
+    if (tile === active) return; // already selected: keep it, don't restart the fill
+    active = tile;
+    tiles.forEach((t) => t.toggleAttribute('data-active', t === tile));
+    const from = Number(tile.dataset.from ?? 0);
+    const to = Number(tile.dataset.to ?? 0);
+    const colour = tile.dataset.colour ?? '';
+    const seconds = 0.5 + (to - from) * 1.5; // longer sections take a little longer to fill
+    done?.style.setProperty('--done', '0'); // hide the map-hover colouring while a section is shown
+
+    // Markers take the section colour: Start (a single point) rings the start marker; a section that begins
+    // at Campo tints the start marker straight away; one that reaches the very end tints the end marker
+    // once the fill gets there.
+    resetMarkers();
+    startMarker?.style.setProperty('--marker-color', colour);
+    endMarker?.style.setProperty('--marker-color', colour);
+    startMarker?.toggleAttribute('data-highlight', to <= from);
+    startMarker?.toggleAttribute('data-tint', from === 0);
+    if (to >= 1) endTimer = window.setTimeout(() => endMarker?.toggleAttribute('data-tint', true), seconds * 1000);
+
+    if (section) {
+      section.style.setProperty('--sec-color', colour);
+      section.style.setProperty('--sec-from', String(from));
+      // Restart the fill: jump back to zero length without animating, then animate to the section's length.
+      section.style.transition = 'none';
+      section.style.setProperty('--sec-len', '0');
+      getComputedStyle(section).getPropertyValue('--sec-len');
+      section.style.transition = '';
+      section.style.setProperty('--sec-duration', `${seconds.toFixed(2)}s`);
+      section.toggleAttribute('data-active', to > from);
+      section.style.setProperty('--sec-len', String(Math.max(0, to - from)));
+    }
+    if (readoutMark) readoutMark.style.color = colour;
+    showReadout();
+  };
+
   tiles.forEach((tile) => {
-    const select = () => {
-      done?.style.setProperty('--done', tile.dataset.f ?? '0');
-      tiles.forEach((t) => t.toggleAttribute('data-active', t === tile));
-      active = tile;
-      showReadout();
+    const preview = () => {
+      if (!pinned) select(tile);
     };
-    tile.addEventListener('pointerenter', select);
-    tile.addEventListener('pointerdown', select);
-    tile.addEventListener('focusin', select);
+    tile.addEventListener('pointerenter', preview);
+    tile.addEventListener('focusin', preview);
+    // Click or tap pins the photo.
+    tile.addEventListener('pointerdown', () => {
+      pinned = tile;
+      select(tile);
+    });
+    tile.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        pinned = tile;
+        select(tile);
+      }
+    });
+  });
+  document.addEventListener('unitschange', showReadout);
+  // The map asks before drawing its own colouring: a pinned section wins, otherwise the section is cleared.
+  document.addEventListener('pct:map-pointer', (e) => {
+    if (pinned) e.preventDefault();
+    else clear();
+  });
+  // A click anywhere else (not a photo, its dialog or the units switch) unpins and clears.
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    if (!target?.closest('[data-pct-photo], dialog, [data-units-toggle]')) clear();
   });
 
   // Click a photo to see it full size.

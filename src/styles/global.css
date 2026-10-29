@@ -75,3 +75,58 @@
     }
   }
 }
+
+/*
+  PCT map section highlight (PctMap.astro, driven by the photo strip in Pct.astro).
+  The overlay shows only the part of the route from --sec-from to --sec-from + --sec-len (both 0–1 of the
+  route's pathLength) in --sec-color. Registering --sec-len as a number lets it animate, so a selected
+  section "fills up" from its start to its end.
+*/
+@property --sec-len {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.pct-section {
+  --sec-from: 0;
+  --sec-color: #038285;
+  fill: none;
+  stroke: var(--sec-color);
+  opacity: 0;
+  transition:
+    --sec-len var(--sec-duration, 0.8s) ease-out,
+    opacity 0.2s;
+}
+.pct-section[data-active] {
+  opacity: 1;
+}
+.pct-section path {
+  stroke-dasharray: calc(var(--sec-len) * 1px) 2px;
+  stroke-dashoffset: calc(var(--sec-from) * -1px);
+}
+
+/* Start / end markers: tinted with the selected section's colour when the section starts at Campo or its
+   fill reaches the end; the "Start" photo (a point, not a stretch of trail) also enlarges the start ring. */
+[data-pct-start],
+[data-pct-end] {
+  transition:
+    stroke 0.3s,
+    r 0.3s;
+}
+[data-pct-start][data-tint],
+[data-pct-end][data-tint],
+[data-pct-start][data-highlight] {
+  stroke: var(--marker-color, #f38ba8);
+}
+[data-pct-start][data-highlight] {
+  r: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pct-section,
+  [data-pct-start],
+  [data-pct-end] {
+    transition: none;
+  }
+}
