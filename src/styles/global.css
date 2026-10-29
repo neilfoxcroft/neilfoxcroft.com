@@ -94,12 +94,15 @@
   fill: none;
   stroke: var(--sec-color);
   opacity: 0;
+  visibility: hidden;
   transition:
     --sec-len var(--sec-duration, 0.8s) ease-out,
-    opacity 0.2s;
+    opacity 0.2s,
+    visibility 0.2s;
 }
 .pct-section[data-active] {
   opacity: 1;
+  visibility: visible;
 }
 .pct-section path {
   stroke-dasharray: calc(var(--sec-len) * 1px) 2px;

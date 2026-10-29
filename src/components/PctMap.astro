@@ -42,12 +42,6 @@ const map = buildPctMap();
           Map of the Pacific Crest Trail, running about 4,200 km from the Mexican border at Campo, California, north
           through Oregon and Washington to the Canadian border at Manning Park.
         </title>
-        <defs>
-          <filter id="pct-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="6"></feGaussianBlur>
-          </filter>
-        </defs>
-
         <path d={map.graticule} fill="none" stroke="#313244" stroke-width="1" opacity="0.6"></path>
 
         <g fill="#24273a" stroke="#45475a" stroke-width="1.5" stroke-linejoin="round">
@@ -85,22 +79,20 @@ const map = buildPctMap();
           </text>
         </g>
 
+        {/*
+          The trail and its glows. Glows are a couple of wider translucent strokes rather than a blur filter:
+          they look much the same but are far cheaper to redraw while the colouring follows the pointer.
+        */}
         <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d={map.trail} stroke="#cdd6f4" stroke-width="8" opacity="0.18" filter="url(#pct-glow)"></path>
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="12" opacity="0.05"></path>
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="7" opacity="0.1"></path>
           <path d={map.trail} stroke="#cdd6f4" stroke-width="3.5"></path>
-          <g
-            data-pct-done
-            stroke="#038285"
-            class="transition-[stroke-dashoffset] duration-150 ease-out [--done:0] [stroke-dashoffset:calc(1_-_var(--done))] motion-reduce:transition-none"
-          >
-            <path
-              d={map.trail}
-              stroke-width="10"
-              opacity="0.6"
-              filter="url(#pct-glow)"
-              pathLength="1"
-              stroke-dasharray="1"
-              class="[stroke-dashoffset:inherit]"></path>
+          {/* Map hover / drag colouring: Campo up to the pointer (--done, 0 to 1). */}
+          <g data-pct-done stroke="#038285" class="[--done:0] [stroke-dashoffset:calc(1_-_var(--done))]">
+            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
+            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
             <path d={map.trail} stroke-width="4.5" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
             ></path>
           </g>
@@ -109,7 +101,8 @@ const map = buildPctMap();
             --sec-from + --sec-len (0 to 1), in --sec-color, and "fills up" by animating --sec-len. See global.css.
           */}
           <g data-pct-section class="pct-section">
-            <path d={map.trail} stroke-width="10" opacity="0.6" filter="url(#pct-glow)" pathLength="1"></path>
+            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1"></path>
+            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1"></path>
             <path d={map.trail} stroke-width="4.5" pathLength="1"></path>
           </g>
         </g>
@@ -173,8 +166,20 @@ const map = buildPctMap();
     done.style.setProperty('--done', (best / (samples.length / 2 - 1)).toFixed(4));
   }
 
+  // Pointer moves can fire several times per frame; only handle the latest one, once per frame.
+  let pendingMove: PointerEvent | undefined;
+  const onMove = (e: PointerEvent) => {
+    if (!pendingMove) {
+      requestAnimationFrame(() => {
+        if (pendingMove) colourTo(pendingMove);
+        pendingMove = undefined;
+      });
+    }
+    pendingMove = e;
+  };
+
   if (map && plane && svg) {
-    svg.addEventListener('pointermove', colourTo);
+    svg.addEventListener('pointermove', onMove);
     // Taps on touch screens colour the route too.
     svg.addEventListener('pointerdown', colourTo);
 
