@@ -15,7 +15,7 @@ Replace the 2020 Create React App site (React 16, Bootstrap 4, class components)
 
 ## Stack (confirmed by Neil, 2026-10-29)
 
-- **Astro + Tailwind CSS**, static output (`dist/`). It's a content site with a few small interactive bits, so Astro ships almost no JS and builds to plain static files for S3. Interactive pieces (scroll timeline, cursor spotlight, PCT line draw) can be small vanilla scripts or tiny islands.
+- **Astro + Tailwind CSS**, static output (`dist/`). It's a content site with a few small interactive bits, so Astro ships almost no JS and builds to plain static files for S3. Interactive pieces (scroll timeline, cursor spotlight, PCT trail colour-in) can be small vanilla scripts or tiny islands.
 - TypeScript. Fonts self-hosted or via Google Fonts: **JetBrains Mono** (whole site); Inter kept as an easy alternative.
 - **Content as data**: put all CV content (profile, experience, education, certifications, projects, PCT stats) in one structured file, e.g. `src/data/resume.json` loosely following JSON Resume. The page renders from it. Later, a separate CV repo will reuse the same data to generate the PDF résumé, so keep the schema clean.
 
@@ -26,11 +26,12 @@ Replace the 2020 Create React App site (React 16, Bootstrap 4, class components)
   - borders `#313244`, `#45475a`
   - body text `#a6adc8`, headings `#cdd6f4`, muted labels `#9399b2` (passes contrast; don't use `#6c7086` for small text)
   - accent `#cba6f7` (mauve), alternatives blue `#89b4fa`, teal `#94e2d5`, peach `#fab387`
-  - PCT trail red `#e64553`
+  - PCT trail: white `#cdd6f4`, coloured in on hover with PCT teal-blue `#038285`, the colour from the official PCT logo (Wikipedia `File:Pct-logo.svg`). Changed 2026-10-29; was red `#e64553`.
 - Font: JetBrains Mono everywhere, base size 15px, line-height 1.7.
 - Section labels are small mono comments: `// about`, `// experience`, etc. That and the font are the only "developer" flavour. Neil explicitly does **not** want a full IDE/terminal skin.
+- Extra accent colour (added 2026-10-29, Neil asked for a bit more colour): the `//` of each section label, the active nav line, the PCT stat numbers and the ↗ arrows on the résumé and journal links are mauve, on top of the existing role title, tags and hover states. Keep it to small touches like these.
 - Tech tags: small rounded pills, accent text on accent at 12% opacity.
-- Motion is minimal: a subtle cursor-following radial spotlight (accent at ~7% opacity, ~560px radius), row hover highlight, the experience scroll timeline and the PCT line draw. Respect `prefers-reduced-motion`.
+- Motion is minimal: a subtle cursor-following radial spotlight (accent at ~7% opacity, ~560px radius), row hover highlight, the experience scroll timeline, the PCT trail colour-in, and (added 2026-10-29) a hover tilt on the PCT map: the map leans up to ~6° towards the cursor and eases back on leave. The spotlight and hover tilt only run with a mouse/trackpad (`hover: hover` and `pointer: fine`). Respect `prefers-reduced-motion`: no spotlight or hover tilt, and the timeline is shown complete.
 
 ## Layout (inspired by brittanychiang.com: Neil's favourite reference)
 
@@ -65,8 +66,10 @@ Two columns on desktop, max width ~1180px, stacked on mobile.
 5. **The PCT** (Pacific Crest Trail):
    - Heading "Mexico to Canada, on foot". Short intro; Neil will write his own story, so leave a placeholder.
    - **3D-tilted map**: an SVG of the US West Coast (CA, OR, WA highlighted; NV, ID, AZ, UT, MT, WY, BC, Baja/Mexico as muted context; faint lat/long grid). It's rendered on a plane with CSS `perspective` + `rotateX(50deg) rotateZ(-22deg)` and a darker slab behind it (`translateZ(-18px)`) for depth. Canada is at the top, Mexico at the bottom.
-   - The PCT route is a red polyline with a soft glow, Campo to Manning Park, and draws itself as the section scrolls into view (`pathLength=1`, `stroke-dashoffset`).
-   - The mockup has hand-simplified coordinates. **Upgrade if practical**: use real state outlines (e.g. US Atlas / Natural Earth TopoJSON) and a real PCT GPX/GeoJSON track, projected at build time to a static SVG.
+   - The PCT route is a white line with a soft glow, Campo to Manning Park. **Changed 2026-10-29 (Neil):** the scroll-driven line draw is gone because it played while the map was still off screen. Instead, moving the mouse along the route colours it PCT teal-blue from Campo up to the cursor, and it goes back to white when the mouse leaves the map. On touch screens, tapping the route colours it up to that point until the next tap. Under the hood, ~120 invisible wide "hit" strips sit on the route, each carrying how far along the trail it ends; the browser hit-tests them correctly through the 3D tilt. State labels are 17px in `#bac2de` and country labels 26px in `#a6adc8` (enlarged and brightened 2026-10-29 so they are readable on the tilted map). Stats sit 4 across, but 2 across between 1024px and 1279px where the column is too narrow for 4.
+   - The mockup has hand-simplified coordinates. **Done (2026-10-29), Neil chose OpenStreetMap for the route:** state outlines come from `us-atlas` (US Census) and Canada/Mexico from `world-atlas` (Natural Earth). The route is OSM superroute relation 1225378, fetched once by `scripts/fetch-pct-trail.mjs`, stitched (~4,220 km), simplified and saved to `src/data/pct-trail.json`. Everything is projected with `d3-geo` at build time into a static SVG. A "Trail data © OpenStreetMap" credit line, linked to openstreetmap.org/copyright, sits under the map (the OSM attribution guidelines accept "© OpenStreetMap" when it links to the licence).
+   - **Layout change from the mockup:** the map sits above the stats rather than beside them. Tilted, the map is ~1.5× its own width on screen, and side by side it overlapped the stats in the 610px column. Stats are a 4-across row (2×2 on phones).
+   - On phones the tilt is gentler (`rotateX(35deg) rotateZ(-8deg)`, 80% width) so it fits 360px screens without sideways scroll.
    - Stats grid: 4,265 km trail length · 3 states · [days on trail] · [pairs of shoes]. Plus "[Read the trail journal]", and three photo slots (desert, Sierra, Cascades). The bracketed items are placeholders for Neil.
 6. **Footer**: "Built by Neil with [stack], deployed on AWS. Source on GitHub. Colours from Catppuccin Mocha."
 

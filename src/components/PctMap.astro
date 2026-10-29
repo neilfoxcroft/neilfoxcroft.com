@@ -1,0 +1,150 @@
+---
+import { buildPctMap, WIDTH, HEIGHT } from '../lib/pct-map';
+
+// All projection maths happens here at build time; the browser just gets the SVG.
+const map = buildPctMap();
+---
+
+{/*
+  The map is an SVG laid on a tilted plane: CSS perspective on the wrapper, then rotateX/rotateZ on the
+  plane, with a darker slab pushed 18px behind it for depth. The tilt is gentler on phones.
+  The negative margins take back the empty space the tilt leaves above and below.
+  The route is drawn white. Moving the mouse along it (or tapping it) colours it blue from Campo up to that
+  point: invisible wide "hit" strips sit on top of the route, each with data-f (how far along the trail it ends,
+  0 to 1), and the script copies that into --done, which sets the blue line's dash offset.
+*/}
+<div class="flex min-w-0 flex-col items-center gap-2">
+  <div id="pct-map" data-pct-map class="flex w-full justify-center perspective-[1600px]">
+    <div
+      data-pct-plane
+      class="relative w-[80%] max-w-[380px] transform-3d transition-transform duration-300 ease-out [--hx:0] [--hy:0] -mt-[28px] [transform:translateX(-10px)_rotateX(35deg)_rotateZ(-8deg)] motion-reduce:transition-none md:mt-[-84px] md:w-[68%] md:mb-[-24px] md:[transform:translateX(-26px)_rotateY(calc(var(--hx)*6deg))_rotateX(calc(50deg_-_var(--hy)*6deg))_rotateZ(-22deg)]"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 rounded-[18px] bg-crust shadow-[0_40px_80px_rgb(0_0_0/0.55)] [transform:translateZ(-18px)]"
+      >
+      </div>
+      <svg
+        role="img"
+        aria-labelledby="pct-map-title"
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        class="relative block h-auto w-full rounded-[18px] border border-line bg-mantle"
+      >
+        <title id="pct-map-title">
+          Map of the Pacific Crest Trail, running about 4,200 km from the Mexican border at Campo, California, north
+          through Oregon and Washington to the Canadian border at Manning Park.
+        </title>
+        <defs>
+          <filter id="pct-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6"></feGaussianBlur>
+          </filter>
+        </defs>
+
+        <path d={map.graticule} fill="none" stroke="#313244" stroke-width="1" opacity="0.6"></path>
+
+        <g fill="#24273a" stroke="#45475a" stroke-width="1.5" stroke-linejoin="round">
+          {map.countries.map((d) => <path d={d} />)}
+          {map.contextStates.map((d) => <path d={d} />)}
+        </g>
+        <g fill="#313244" stroke="#6c7086" stroke-width="2" stroke-linejoin="round">
+          {map.trailStates.map((d) => <path d={d} />)}
+        </g>
+
+        <g font-family="JetBrains Mono Variable, monospace" font-weight="600" text-anchor="middle" pointer-events="none">
+          {
+            map.stateLabels.map((l) => (
+              <text x={l.x} y={l.y} font-size="17" letter-spacing="2" fill="#bac2de">
+                {l.text}
+              </text>
+            ))
+          }
+          {
+            map.countryLabels.map((l) => (
+              <text x={l.x} y={l.y} font-size="26" letter-spacing="3" fill="#a6adc8">
+                {l.text}
+              </text>
+            ))
+          }
+          <text
+            x={map.ocean.x}
+            y={map.ocean.y}
+            font-size="17"
+            letter-spacing="3"
+            fill="#7f849c"
+            transform={`rotate(-90 ${map.ocean.x} ${map.ocean.y})`}
+          >
+            PACIFIC OCEAN
+          </text>
+        </g>
+
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="8" opacity="0.18" filter="url(#pct-glow)"></path>
+          <path d={map.trail} stroke="#cdd6f4" stroke-width="3.5"></path>
+          <g
+            data-pct-done
+            stroke="#038285"
+            class="transition-[stroke-dashoffset] duration-150 ease-out [--done:0] [stroke-dashoffset:calc(1_-_var(--done))] motion-reduce:transition-none"
+          >
+            <path
+              d={map.trail}
+              stroke-width="10"
+              opacity="0.6"
+              filter="url(#pct-glow)"
+              pathLength="1"
+              stroke-dasharray="1"
+              class="[stroke-dashoffset:inherit]"></path>
+            <path d={map.trail} stroke-width="4.5" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
+            ></path>
+          </g>
+        </g>
+        <g aria-hidden="true" fill="none" stroke="transparent" stroke-width="28" stroke-linecap="round" pointer-events="stroke">
+          {map.segments.map((seg) => <path d={seg.d} data-f={seg.f} class="cursor-crosshair" />)}
+        </g>
+
+        <circle cx={map.start.x} cy={map.start.y} r="8" fill="#1e1e2e" stroke="#cdd6f4" stroke-width="3" pointer-events="none"
+        ></circle>
+        <circle cx={map.end.x} cy={map.end.y} r="8" fill="#cdd6f4" stroke="#1e1e2e" stroke-width="3" pointer-events="none"
+        ></circle>
+        <g font-family="JetBrains Mono Variable, monospace" font-size="15" fill="#cdd6f4" pointer-events="none">
+          <text x={map.start.x + 16} y={map.start.y - 10}>Campo</text>
+          <text x={map.end.x + 16} y={map.end.y + 6}>Manning Park</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <p class="m-0 text-[0.8rem] text-muted">
+    Trail data <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">{map.attribution}</a>
+  </p>
+</div>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const map = document.querySelector<HTMLElement>('[data-pct-map]');
+  const plane = map?.querySelector<HTMLElement>('[data-pct-plane]');
+  const done = map?.querySelector<SVGGElement>('[data-pct-done]');
+
+  // Colour the route blue from Campo up to the hit strip under the pointer.
+  function colourTo(e: PointerEvent) {
+    const f = (e.target as Element).getAttribute?.('data-f');
+    if (f && done) done.style.setProperty('--done', f);
+  }
+
+  if (map && plane && done) {
+    map.addEventListener('pointermove', (e) => {
+      colourTo(e);
+      // Hover tilt (mouse/trackpad only): the map leans a few degrees towards the cursor via --hx/--hy (-1 to 1).
+      if (!finePointer.matches || reduceMotion.matches) return;
+      const box = map.getBoundingClientRect();
+      plane.style.setProperty('--hx', (((e.clientX - box.left) / box.width) * 2 - 1).toFixed(3));
+      plane.style.setProperty('--hy', (((e.clientY - box.top) / box.height) * 2 - 1).toFixed(3));
+    });
+    // Taps on touch screens colour the route too; it stays until the next tap.
+    map.addEventListener('pointerdown', colourTo);
+    map.addEventListener('pointerleave', (e) => {
+      plane.style.setProperty('--hx', '0');
+      plane.style.setProperty('--hy', '0');
+      if (e.pointerType === 'mouse') done.style.setProperty('--done', '0');
+    });
+  }
+</script>
