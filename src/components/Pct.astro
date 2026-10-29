@@ -1,0 +1,51 @@
+---
+import SectionLabel from './SectionLabel.astro';
+import resume from '../data/resume.json';
+
+const { pct } = resume;
+---
+
+<section id="pct" aria-label="Pacific Crest Trail" class="flex scroll-mt-24 flex-col gap-6">
+  <SectionLabel text="pacific crest trail" />
+  <div class="flex flex-col gap-3">
+    <h3 class="m-0 text-[1.4rem] font-bold tracking-tight text-heading">{pct.heading}</h3>
+    <p class="m-0 max-w-[40rem]">{pct.intro}</p>
+  </div>
+
+  <div class="flex flex-col gap-8 md:flex-row md:items-center">
+    {/* The 3D-tilted map replaces this box in the PCT step. */}
+    <div
+      id="pct-map"
+      class="flex aspect-[600/888] w-full max-w-[340px] items-center justify-center self-center rounded-[18px] border border-line bg-mantle text-[0.8rem] text-muted md:flex-[1_1_380px]"
+    >
+      [map · PCT step]
+    </div>
+
+    <div class="flex flex-col gap-6 md:flex-[1_1_220px]">
+      <dl class="m-0 grid grid-cols-2 gap-x-4 gap-y-6">
+        {
+          pct.stats.map((s) => (
+            <div class="flex flex-col-reverse">
+              <dt class="text-[0.8rem] text-muted">{s.label}</dt>
+              <dd class="m-0 text-[1.6rem] leading-tight font-bold text-heading">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      {/* Becomes a link once there's a journal URL in resume.json. */}
+      <p class="m-0 font-semibold text-muted">
+        {pct.journal.label} <span aria-hidden="true">↗</span>
+      </p>
+    </div>
+  </div>
+
+  <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    {
+      pct.photos.map((ph) => (
+        <li class="flex aspect-[4/3] items-center justify-center rounded-[10px] border border-dashed border-line-strong p-2 text-center text-[0.75rem] text-muted">
+          {ph.label}
+        </li>
+      ))
+    }
+  </ul>
+</section>

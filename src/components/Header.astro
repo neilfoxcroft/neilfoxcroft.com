@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+import resume from '../data/resume.json';
+
+const { basics } = resume;
+const github = basics.profiles.find((p) => p.network === 'GitHub')!;
+const linkedin = basics.profiles.find((p) => p.network === 'LinkedIn')!;
+
+const nav = [
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'pct', label: 'The PCT' },
+];
+
+// 44px square tap target around a 22px icon.
+const iconLink = 'inline-flex size-[44px] items-center justify-center rounded-md text-text hover:text-accent';
+---
+
+<header class="flex flex-col gap-10 lg:sticky lg:top-0 lg:max-h-screen lg:w-[42%] lg:max-w-[420px] lg:shrink-0 lg:py-24">
+  <div class="flex flex-col gap-3">
+    <h1 class="m-0 text-[2.4rem] leading-[1.1] font-bold tracking-tight text-heading sm:text-[2.75rem]">
+      <a href="/" class="text-heading hover:text-heading">{basics.name}</a>
+    </h1>
+    <p class="m-0 text-[1.15rem] font-medium text-heading">{basics.label}</p>
+    <p class="m-0 max-w-[22rem]">{basics.pitch}</p>
+    <p class="m-0 text-[0.8rem] text-muted">
+      {basics.location.city}, {basics.location.countryCode} · {basics.location.note}
+    </p>
+  </div>
+
+  <nav aria-label="Sections" class="hidden lg:block">
+    <ul class="flex flex-col">
+      {
+        nav.map((n) => (
+          <li>
+            <a
+              href={`#${n.id}`}
+              data-nav={n.id}
+              class="group flex items-center gap-4 py-3 text-[0.8rem] tracking-[0.08em] text-muted uppercase hover:text-heading aria-[current=true]:text-heading"
+            >
+              <span
+                aria-hidden="true"
+                class="h-px w-8 bg-current transition-all duration-200 group-hover:w-16 group-aria-[current=true]:w-16 motion-reduce:transition-none"
+              />
+              <span>{n.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <ul class="-ml-2.5 flex flex-wrap items-center gap-2" aria-label="Links">
+    <li>
+      <a href={github.url} aria-label="GitHub" class={iconLink} rel="me noopener" target="_blank">
+        <Icon name="github" />
+      </a>
+    </li>
+    <li>
+      <a href={linkedin.url} aria-label="LinkedIn" class={iconLink} rel="me noopener" target="_blank">
+        <Icon name="linkedin" />
+      </a>
+    </li>
+    <li>
+      <a href={`mailto:${basics.email}`} aria-label="Email" class={iconLink}>
+        <Icon name="mail" />
+      </a>
+    </li>
+    <li>
+      <a
+        href={basics.resumeUrl}
+        class="inline-flex min-h-[44px] items-center gap-2 rounded-md px-2.5 text-[0.8rem] text-text hover:text-accent"
+        target="_blank"
+        rel="noopener"
+      >
+        <Icon name="file" size={20} />
+        <span>résumé.pdf</span>
+      </a>
+    </li>
+  </ul>
+</header>

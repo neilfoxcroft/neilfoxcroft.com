@@ -1,0 +1,41 @@
+---
+import SectionLabel from './SectionLabel.astro';
+import resume from '../data/resume.json';
+import { dateRange } from '../lib/format';
+
+const card = 'flex flex-col gap-1.5 rounded-[10px] border border-line p-5';
+---
+
+<section id="education" aria-label="Education and certifications" class="flex flex-col gap-4">
+  <SectionLabel text="education" />
+  <ul class="grid gap-4 sm:grid-cols-2">
+    {
+      resume.education.map((ed) => (
+        <li class={card}>
+          <p class="m-0 text-[0.8rem] text-muted">{dateRange(ed.startDate, ed.endDate)}</p>
+          <h3 class="m-0 text-[1rem] font-semibold text-heading">
+            {ed.studyType}, {ed.area}
+          </h3>
+          <p class="m-0 text-[0.8rem] text-muted">{ed.institution}</p>
+          {ed.summary && <p class="m-0 mt-1 text-[0.9rem]">{ed.summary}</p>}
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-6">
+    <SectionLabel text="certifications" sticky={false} />
+  </div>
+  <ul class="grid gap-4 sm:grid-cols-2">
+    {
+      resume.certificates.map((c) => (
+        <li class="rounded-[10px] border border-line px-5 py-4">
+          <h3 class="m-0 text-[0.95rem] font-semibold text-heading">{c.name}</h3>
+          <p class="m-0 mt-1 text-[0.8rem] text-muted">
+            {c.issuer} · {c.date}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</section>

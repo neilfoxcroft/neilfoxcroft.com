@@ -1,0 +1,121 @@
+{
+  "basics": {
+    "name": "Neil Foxcroft",
+    "label": "Backend Software Engineer",
+    "pitch": "I build the Java and Kotlin services that connect banks, retailers and their partners, and keep them running in production.",
+    "email": "neilfoxcroftpro@gmail.com",
+    "location": {
+      "city": "Pretoria",
+      "countryCode": "ZA",
+      "note": "open to relocation"
+    },
+    "profiles": [
+      { "network": "GitHub", "username": "neilfoxcroft", "url": "https://github.com/neilfoxcroft" },
+      { "network": "LinkedIn", "username": "neil-foxcroft-39a7991a1", "url": "https://www.linkedin.com/in/neil-foxcroft-39a7991a1/" }
+    ],
+    "resumeUrl": "/files/NeilFoxcroftResume.pdf",
+    "about": [
+      "I'm a backend engineer at **Entelect** with 4.5+ years building Java and Kotlin Spring Boot microservices for banking and retail financial services. Most of my work sits where systems meet: the APIs, integrations and orchestration that let digital channels, partners and point-of-sale systems talk to each other.",
+      "Most recently, at **Shoprite Financial Services**, I owned the electricity supplier integrations for Namibia and Botswana end to end, from requirements and partner calls through release and production support. Before that I spent two years on value-added services at **Standard Bank**.",
+      "Away from the keyboard I climb, hike (most recently the whole Pacific Crest Trail), am learning to paint Warhammer miniatures, and tinker with a homelab."
+    ]
+  },
+  "work": [
+    {
+      "name": "Entelect",
+      "position": "Software Engineer",
+      "url": "https://www.entelect.co.za",
+      "startDate": "2022",
+      "summary": "Software consultancy. Placed with clients as a backend engineer, alongside work on Entelect's own initiatives.",
+      "engagements": [
+        {
+          "name": "Shoprite Financial Services",
+          "type": "Client",
+          "description": "Money Market value-added services",
+          "startDate": "2024",
+          "endDate": "2026",
+          "summary": "Built Kotlin and Spring Boot services for electricity, airtime, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, and owned the Namibia and Botswana electricity integrations end to end.",
+          "keywords": ["Kotlin", "Spring Boot", "BFF", "Datadog", "WireMock"]
+        },
+        {
+          "name": "Standard Bank",
+          "type": "Client",
+          "description": "Value Added Services",
+          "url": "https://www.standardbank.co.za",
+          "startDate": "2022",
+          "endDate": "2024",
+          "summary": "Developed Java and Spring Boot microservices for product catalogue, quote, order and settlement flows, and contributed to the MNO rewrite for airtime, data, SMS, electricity and lottery products. Migrated Angular front ends to micro-frontends in an Nx monorepo.",
+          "keywords": ["Java", "Spring Boot", "Angular", "Nx", "SonarQube"]
+        },
+        {
+          "name": "Entelect Challenge",
+          "type": "Internal",
+          "description": "Cloud Squad, part-time",
+          "url": "https://challenge.entelect.co.za",
+          "startDate": "2022",
+          "summary": "Maintain the AWS infrastructure behind the competition platform: game engine, website, player portal, forum and submissions. Led the cloud team for a year, owning deployment pipelines and production support.",
+          "keywords": ["AWS", "CI/CD", "Infrastructure"]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "North-West University",
+      "studyType": "BSc Honours",
+      "area": "Computer Science & IT",
+      "startDate": "2021",
+      "endDate": "2021",
+      "summary": "Specialised in AI, advanced databases, computer security and information systems engineering. Thesis: detecting StyleGAN-generated images with deep learning."
+    },
+    {
+      "institution": "North-West University",
+      "studyType": "BSc",
+      "area": "Information Technology",
+      "startDate": "2017",
+      "endDate": "2020"
+    }
+  ],
+  "certificates": [
+    { "name": "AWS Certified Cloud Practitioner", "issuer": "Amazon Web Services", "date": "2022" },
+    { "name": "Azure Cosmos DB Developer Specialty", "issuer": "Microsoft", "date": "2025" }
+  ],
+  "projects": [
+    {
+      "name": "BLEGO: Braille-like toy blocks",
+      "kind": "Patent · 2017",
+      "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
+      "keywords": ["FIRST LEGO League", "Accessibility"]
+    },
+    {
+      "name": "[Homelab write-up]",
+      "kind": "[Coming soon]",
+      "placeholder": true,
+      "description": "[Placeholder: the self-hosted stack, the hardware, and how it is deployed and managed.]",
+      "keywords": ["[tags]"]
+    },
+    {
+      "name": "[Public backend project]",
+      "kind": "[Coming soon]",
+      "placeholder": true,
+      "description": "[Placeholder: a small Spring Boot or Kotlin service with Terraform that shows how you design and ship backend work.]",
+      "keywords": ["[tags]"]
+    }
+  ],
+  "pct": {
+    "heading": "Mexico to Canada, on foot",
+    "intro": "In 2026 I thru-hiked the Pacific Crest Trail, from the Mexican border at Campo to the Canadian border at Manning Park, through the deserts, the Sierra Nevada and the Cascades. [A few lines in your own words: why you did it, a highlight, what it taught you.]",
+    "stats": [
+      { "value": "4,265 km", "label": "trail length" },
+      { "value": "3", "label": "states" },
+      { "value": "[__]", "label": "days on trail" },
+      { "value": "[__]", "label": "pairs of shoes" }
+    ],
+    "journal": { "label": "[Read the trail journal]" },
+    "photos": [
+      { "label": "[photo · desert]" },
+      { "label": "[photo · Sierra]" },
+      { "label": "[photo · Cascades]" }
+    ]
+  }
+}

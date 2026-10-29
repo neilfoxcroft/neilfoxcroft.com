@@ -1,0 +1,115 @@
+---
+import SectionLabel from './SectionLabel.astro';
+import Tags from './Tags.astro';
+import resume from '../data/resume.json';
+import { dateRange } from '../lib/format';
+---
+
+<section id="experience" aria-label="Experience" class="flex scroll-mt-24 flex-col gap-6">
+  <SectionLabel text="experience" />
+
+  {
+    resume.work.map((job) => (
+      <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <div class="flex flex-col gap-1">
+              <h3 class="m-0 text-[1.4rem] font-bold tracking-tight text-heading">
+                <a href={job.url} target="_blank" rel="noopener" class="-my-1 inline-block py-1 text-heading hover:text-accent">
+                  {job.name} <span aria-hidden="true" class="text-[1rem] text-muted">↗</span>
+                </a>
+              </h3>
+              <p class="m-0 font-medium text-accent">{job.position}</p>
+            </div>
+            <p class="m-0 text-[0.8rem] tracking-[0.04em] text-muted">{dateRange(job.startDate)}</p>
+          </div>
+          <p class="m-0 text-[0.9rem]">{job.summary}</p>
+        </div>
+
+        {/*
+          Scroll timeline. The script below sets --xp (0 to 1) on the track as you scroll through it;
+          the gradient fill's height follows it, and each entry's dot gets data-reached once the fill passes it.
+        */}
+        <div data-timeline class="relative flex gap-5 [--xp:0] sm:gap-8">
+          <div aria-hidden="true" class="relative w-[3px] shrink-0 rounded-full bg-line">
+            <div class="absolute inset-x-0 top-0 h-[calc(var(--xp)*100%)] rounded-full bg-linear-to-b from-accent via-blue via-55% to-teal">
+              <span class="absolute -bottom-[5px] -left-1 size-[11px] rounded-full bg-teal shadow-[0_0_0_4px_rgb(148_226_213/0.18),0_0_16px_rgb(148_226_213/0.6)]" />
+            </div>
+          </div>
+          <ol class="flex min-w-0 flex-1 flex-col gap-4">
+            {job.engagements.map((e) => (
+              <li class="group relative flex flex-col gap-2 rounded-[10px] border border-transparent py-3 transition-colors lg:p-5 lg:hover:border-line lg:hover:bg-heading/[0.035]">
+                <span
+                  aria-hidden="true"
+                  data-dot
+                  class="absolute top-[1.15rem] -left-[calc(1.25rem+6px)] size-[9px] rounded-full bg-line-strong ring-3 ring-bg transition-colors duration-300 data-reached:bg-heading sm:-left-[calc(2rem+6px)] lg:top-[1.9rem] motion-reduce:transition-none"
+                />
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <h4 class="m-0 text-[1.05rem] leading-snug font-semibold text-heading">
+                    {e.url ? (
+                      <a href={e.url} target="_blank" rel="noopener" class="-my-1 inline-block py-1 text-heading group-hover:text-accent">
+                        {e.name} <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span class="transition-colors group-hover:text-accent">{e.name}</span>
+                    )}
+                  </h4>
+                  <p class="m-0 text-[0.8rem] tracking-[0.04em] text-muted">{dateRange(e.startDate, e.endDate)}</p>
+                </div>
+                <p class="m-0 text-[0.8rem] text-muted">
+                  {e.type} · {e.description}
+                </p>
+                <p class="m-0 text-[0.9rem]">{e.summary}</p>
+                <Tags items={e.keywords} />
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    ))
+  }
+
+  <a
+    href={resume.basics.resumeUrl}
+    target="_blank"
+    rel="noopener"
+    class="inline-flex min-h-[44px] items-center gap-1 self-start font-semibold text-heading"
+  >
+    View full résumé <span aria-hidden="true">↗</span>
+  </a>
+</section>
+
+<script>
+  // Fills the timeline as the section scrolls past 60% of the screen height.
+  // With "reduce motion" switched on, the timeline is simply shown full.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const timelines = document.querySelectorAll<HTMLElement>('[data-timeline]');
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    const line = window.innerHeight * 0.6;
+    timelines.forEach((tl) => {
+      const box = tl.getBoundingClientRect();
+      const xp = reduceMotion.matches ? 1 : Math.min(1, Math.max(0, (line - box.top) / box.height));
+      tl.style.setProperty('--xp', xp.toFixed(4));
+      tl.querySelectorAll<HTMLElement>('[data-dot]').forEach((dot) => {
+        const d = dot.getBoundingClientRect();
+        const at = (d.top + d.height / 2 - box.top) / box.height;
+        dot.toggleAttribute('data-reached', xp > 0 && at <= xp);
+      });
+    });
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  reduceMotion.addEventListener('change', update);
+  update();
+</script>
