@@ -11,7 +11,7 @@
     },
     "profiles": [
       { "network": "GitHub", "username": "neilfoxcroft", "url": "https://github.com/neilfoxcroft" },
-      { "network": "LinkedIn", "username": "neil-foxcroft-39a7991a1", "url": "https://www.linkedin.com/in/neil-foxcroft-39a7991a1/" }
+      { "network": "LinkedIn", "username": "neilfoxcroft", "url": "https://www.linkedin.com/in/neilfoxcroft/" }
     ],
     "resumeUrl": "/files/NeilFoxcroftResume.pdf",
     "about": [
@@ -74,7 +74,13 @@
       "area": "Information Technology",
       "startDate": "2017",
       "endDate": "2020",
-      "summary": "[Placeholder: a line or two about this degree, e.g. your majors, a project or module you enjoyed, or what led you to the Honours year.]"
+      "summary": "Alongside the degree I served two terms on the RAG Technical Committee. RAG (now JOOL) is one of the biggest charity drives in the Southern Hemisphere, and it was entirely student-run while I was there. The technical committee kept its events safe and helped maintain and develop the RAG Farm, its concert venue.",
+      "activities": [
+        { "date": "2019/20", "name": "RAG Technical Committee" },
+        { "date": "2018/19", "name": "RAG Technical Committee" },
+        { "date": "2017", "name": "De Wilgers men's residence debate team" },
+        { "date": "2017", "name": "De Wilgers men's residence solo singer (enkelsêr)" }
+      ]
     }
   ],
   "certificates": [
