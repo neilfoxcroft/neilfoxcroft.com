@@ -43,7 +43,7 @@ for (let i = 0; i < points.length; i += 100) {
   const batch = points.slice(i, i + 100);
   const url = `${API}?locations=${batch.map(([lon, lat]) => `${lat},${lon}`).join('|')}`;
   const res = await fetch(url, {
-    headers: { 'User-Agent': 'neilfoxcroft.com-map-build/1.0 (+https://github.com/neilfoxcroft/neilfoxcroft.com-repo)' },
+    headers: { 'User-Agent': 'neilfoxcroft.com-map-build/1.0 (+https://github.com/neilfoxcroft/neilfoxcroft.com)' },
   });
   if (!res.ok) throw new Error(`OpenTopoData returned ${res.status}`);
   const body = await res.json();

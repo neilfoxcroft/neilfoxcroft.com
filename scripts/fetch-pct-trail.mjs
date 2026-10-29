@@ -20,7 +20,7 @@ const res = await fetch('https://overpass-api.de/api/interpreter', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
-    'User-Agent': 'neilfoxcroft.com-map-build/1.0 (+https://github.com/neilfoxcroft/neilfoxcroft.com-repo)',
+    'User-Agent': 'neilfoxcroft.com-map-build/1.0 (+https://github.com/neilfoxcroft/neilfoxcroft.com)',
   },
   body: new URLSearchParams({ data: query }),
 });
