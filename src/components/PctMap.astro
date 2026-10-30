@@ -36,6 +36,7 @@ const map = buildPctMap();
         aria-labelledby="pct-map-title"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         data-samples={JSON.stringify(map.samples)}
+        style={`--trail-len: ${map.trailLength}`}
         class="relative block h-auto w-full cursor-crosshair touch-none rounded-[18px] border border-line bg-mantle [&_*]:pointer-events-none"
       >
         <title id="pct-map-title">
@@ -82,28 +83,30 @@ const map = buildPctMap();
         {/*
           The trail and its glows. Glows are a couple of wider translucent strokes rather than a blur filter:
           they look much the same but are far cheaper to redraw while the colouring follows the pointer.
+          The route is drawn nine times (three strokes each for the line, the hover colouring and the section
+          highlight), so its path data is defined once and reused with <use>, which keeps the page small.
         */}
+        <defs>
+          <path id="pct-route" d={map.trail}></path>
+        </defs>
         <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d={map.trail} stroke="#cdd6f4" stroke-width="12" opacity="0.05"></path>
-          <path d={map.trail} stroke="#cdd6f4" stroke-width="7" opacity="0.1"></path>
-          <path d={map.trail} stroke="#cdd6f4" stroke-width="3.5"></path>
+          <use href="#pct-route" stroke="#cdd6f4" stroke-width="12" opacity="0.05"></use>
+          <use href="#pct-route" stroke="#cdd6f4" stroke-width="7" opacity="0.1"></use>
+          <use href="#pct-route" stroke="#cdd6f4" stroke-width="3.5"></use>
           {/* Map hover / drag colouring: Campo up to the pointer (--done, 0 to 1). */}
-          <g data-pct-done stroke="#038285" class="[--done:0] [stroke-dashoffset:calc(1_-_var(--done))]">
-            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
-            ></path>
-            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
-            ></path>
-            <path d={map.trail} stroke-width="4.5" pathLength="1" stroke-dasharray="1" class="[stroke-dashoffset:inherit]"
-            ></path>
+          <g data-pct-done stroke="#038285" class="[--done:0] [stroke-dasharray:calc(var(--trail-len)*1px)_calc(var(--trail-len)*1px)] [stroke-dashoffset:calc((1_-_var(--done))*var(--trail-len)*1px)]">
+            <use href="#pct-route" stroke-width="15" opacity="0.15"></use>
+            <use href="#pct-route" stroke-width="9" opacity="0.3"></use>
+            <use href="#pct-route" stroke-width="4.5"></use>
           </g>
           {/*
             Section highlight (driven by the photo strip): shows only the slice of the route from --sec-from to
             --sec-from + --sec-len (0 to 1), in --sec-color, and "fills up" by animating --sec-len. See global.css.
           */}
           <g data-pct-section class="pct-section">
-            <path d={map.trail} stroke-width="15" opacity="0.15" pathLength="1"></path>
-            <path d={map.trail} stroke-width="9" opacity="0.3" pathLength="1"></path>
-            <path d={map.trail} stroke-width="4.5" pathLength="1"></path>
+            <use href="#pct-route" stroke-width="15" opacity="0.15"></use>
+            <use href="#pct-route" stroke-width="9" opacity="0.3"></use>
+            <use href="#pct-route" stroke-width="4.5"></use>
           </g>
         </g>
 
@@ -182,6 +185,11 @@ const map = buildPctMap();
   };
 
   if (map && plane && svg) {
+    // The colourings dash the route by real length (--trail-len, in SVG units) rather than with pathLength,
+    // which Safari doesn't apply to dashes. The build sets an estimate; measure the drawn path exactly here.
+    const route = svg.querySelector<SVGPathElement>('#pct-route');
+    if (route) svg.style.setProperty('--trail-len', route.getTotalLength().toFixed(1));
+
     svg.addEventListener('pointermove', onMove);
     // Pressing on the map (finger or mouse) counts as clicking elsewhere: it unpins any pinned photo section.
     // On touch the SVG has touch-action: none, so a finger dragged across the map traces the trail instead
