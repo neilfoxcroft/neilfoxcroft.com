@@ -21,12 +21,31 @@
   --color-faint: #8188a1;
   --color-chart: #6c7086;
 
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono Fallback Consolas', 'JetBrains Mono Fallback Menlo', ui-monospace,
+    monospace;
+}
+
+/*
+  Size-matched fallbacks for JetBrains Mono. Until the web font arrives the text is set in a system monospace font;
+  scaled to JetBrains Mono's character width (0.6em), the swap doesn't reflow the text and shift the page.
+  Consolas (Windows) is 0.55em wide, Menlo (macOS, iOS) and DejaVu Sans Mono (Linux) 0.602em.
+*/
+@font-face {
+  font-family: 'JetBrains Mono Fallback Consolas';
+  src: local('Consolas');
+  size-adjust: 109.1%;
+}
+@font-face {
+  font-family: 'JetBrains Mono Fallback Menlo';
+  src: local('Menlo'), local('DejaVu Sans Mono');
+  size-adjust: 99.7%;
 }
 
 /*
   Light theme (Catppuccin Latte), chosen with the switch in the footer (Footer.astro) and applied before the page
-  paints (Base.astro). Teal and peach are a little darker than Latte's so small text keeps AA contrast. The PCT
+  paints (Base.astro). Muted, mauve, blue, teal and peach are a little darker than Latte's so small text keeps
+  AA contrast (4.5:1) on both the page and card backgrounds (checked with axe-core, 2026-10-30). The PCT
   map card and the places globe stay dark in both themes: .theme-dark puts the Mocha colours back inside them.
 */
 html {
@@ -41,13 +60,13 @@ html[data-theme='light'] {
   --color-line-strong: #bcc0cc;
   --color-text: #5c5f77;
   --color-heading: #4c4f69;
-  --color-muted: #6c6f85;
-  --color-accent: #8839ef;
-  --color-blue: #1e66f5;
-  --color-teal: #137a80;
-  --color-peach: #c4510a;
+  --color-muted: #62657b;
+  --color-accent: #7a2edc;
+  --color-blue: #1a5ad9;
+  --color-teal: #0f7177;
+  --color-peach: #a84506;
   --color-trail: #d20f39;
-  --color-faint: #6c6f85;
+  --color-faint: #62657b;
   --color-chart: #9ca0b0;
 }
 /* Footer theme switch: show the label for the theme it switches to. */
@@ -189,8 +208,9 @@ html[data-theme='light'] .theme-dark {
 /*
   PCT map section highlight (PctMap.astro, driven by the photo strip in Pct.astro).
   The overlay shows only the part of the route from --sec-from to --sec-from + --sec-len (both 0–1 of the
-  route's pathLength) in --sec-color. Registering --sec-len as a number lets it animate, so a selected
-  section "fills up" from its start to its end.
+  route's length) in --sec-color. They become real dash lengths through --trail-len, the route's drawn length
+  set on the map (pathLength isn't used: Safari ignores it for dashes). Registering --sec-len as a number lets
+  it animate, so a selected section "fills up" from its start to its end.
 */
 @property --sec-len {
   syntax: '<number>';
@@ -214,9 +234,9 @@ html[data-theme='light'] .theme-dark {
   opacity: 1;
   visibility: visible;
 }
-.pct-section path {
-  stroke-dasharray: calc(var(--sec-len) * 1px) 2px;
-  stroke-dashoffset: calc(var(--sec-from) * -1px);
+.pct-section use {
+  stroke-dasharray: calc(var(--sec-len) * var(--trail-len) * 1px) calc(var(--trail-len) * 2px);
+  stroke-dashoffset: calc(var(--sec-from) * var(--trail-len) * -1px);
 }
 
 /* Start / end markers: tinted with the selected section's colour when the section starts at Campo or its

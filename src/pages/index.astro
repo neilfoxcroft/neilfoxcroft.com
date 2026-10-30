@@ -7,9 +7,30 @@ import Education from '../components/Education.astro';
 import Projects from '../components/Projects.astro';
 import Pct from '../components/Pct.astro';
 import Footer from '../components/Footer.astro';
+import resume from '../data/resume.json';
+
+// Structured data (schema.org Person) so search engines can tie this site to Neil's GitHub and LinkedIn and
+// show his title, employer and skills. Built from resume.json; the skills match the CV's skills section.
+const { basics, work, education } = resume;
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: basics.name,
+  jobTitle: basics.label,
+  url: 'https://neilfoxcroft.com/',
+  email: `mailto:${basics.email}`,
+  sameAs: basics.profiles.map((p) => p.url),
+  worksFor: { '@type': 'Organization', name: work[0].name, url: work[0].url },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: education[0].institution },
+  address: { '@type': 'PostalAddress', addressLocality: basics.location.city, addressCountry: basics.location.countryCode },
+  knowsAbout: ['Java', 'Kotlin', 'Spring Boot', 'Microservices', 'REST APIs', 'Third-party integrations', 'AWS', 'Terraform', 'CI/CD', 'TypeScript', 'Angular', 'React'],
+};
+// "<" escaped so the JSON can never close the script tag early.
+const personJson = JSON.stringify(person).replace(/</g, '\\u003c');
 ---
 
 <Base>
+  <script slot="head" type="application/ld+json" is:inline set:html={personJson} />
   <a
     href="#content"
     class="fixed top-4 left-4 z-50 -translate-y-24 rounded-md bg-accent px-4 py-2 font-semibold text-bg focus:translate-y-0 focus:text-bg"

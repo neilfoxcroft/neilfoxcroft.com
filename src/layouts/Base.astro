@@ -62,6 +62,8 @@ const ogImage = new URL('/og-image.png', Astro.site);
         }
       } catch {}
     </script>
+    {/* Page-specific head tags, e.g. the home page's structured data. */}
+    <slot name="head" />
   </head>
   <body>
     <slot />

@@ -23,6 +23,13 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 
 - [x] **Visitor analytics** (2026-10-29): GoatCounter added (code `foxcroft`, dashboard https://foxcroft.goatcounter.com), production builds only. Background: CloudFront access logs (and WAF logs) are **not available on the CloudFront Free plan** (paid plans only, from Pro at $15/month; tried 2026-10-29, AWS refused). Free options: CloudFront console Reports & analytics and the plan's Security dashboard (aggregate), or a cookie-free analytics service such as GoatCounter (Neil would create the account).
 
+- [x] **Tidy AWS storage that grows with every deploy** (done 2026-10-30): lifecycle rule `expire-pipeline-artifacts-after-30-days` on `codepipeline-eu-west-2-30919856588` (prefix `cicd-neilfoxcroft/`, also aborts unfinished uploads after 7 days), and 30-day retention on the log group `/aws/codebuild/neilfoxcroft-build`. Each deploy costs about $0.001 (2 of the 100 free build minutes a month; the pipeline is in the always-free tier).
+- Note: AWS Cost Explorer API calls cost $0.01 each; check costs in the console (Billing → Cost Explorer) instead of the CLI.
+
+- [ ] **After the next deploy: submit the sitemap** https://neilfoxcroft.com/sitemap.xml in Google Search Console (and Bing Webmaster Tools) so the new pages get indexed quickly.
+- [x] **Security headers on CloudFront** (live 2026-10-30; Neil ran `node infra/apply-security-headers.mjs`): the Free plan refuses custom response headers policies (tried 2026-10-30), so the script attaches AWS's managed Managed-SecurityHeadersPolicy (HSTS, nosniff, X-Frame-Options SAMEORIGIN, strict-origin-when-cross-origin referrer, X-XSS-Protection) and deletes the unused custom policy. The full CSP ships in the pages.
+- [ ] Minor: the default CloudFront address (d1397v5vx9uxmk.cloudfront.net) also serves the site; harmless (canonical tags point to neilfoxcroft.com), could redirect it later.
+
 ## Already pending
 
 - [x] New résumé PDF: the Reactive Resume export is now `public/files/NeilFoxcroftResume.pdf` (2026-10-29).

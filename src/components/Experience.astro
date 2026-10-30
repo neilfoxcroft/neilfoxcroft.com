@@ -33,7 +33,7 @@ const trailStyle = `mask-image:${trailMask()};mask-size:${TRAIL_TRACK}px ${TRAIL
         {/*
           Scroll timeline. The script below sets --xp (0 to 1) on the track as you scroll through it; the
           gradient fill's height follows it along the trail, and each entry's dot gets data-reached once the
-          fill passes it. The script also shifts the glowing head (--hx) and the dots (--dx) sideways so they
+          fill passes it. The script also shifts the glowing head (--head-x) and the dots (--dx) sideways so they
           sit on the trail's bends.
         */}
         <div data-timeline class="relative flex gap-5 [--xp:0] sm:gap-8">
@@ -43,7 +43,7 @@ const trailStyle = `mask-image:${trailMask()};mask-size:${TRAIL_TRACK}px ${TRAIL
             </div>
             <span
               data-trail-head
-              class="absolute top-[calc(var(--xp)*100%)] left-1/2 size-[11px] translate-x-[calc(-50%+var(--hx,0px))] -translate-y-1/2 rounded-full bg-teal shadow-[0_0_0_4px_rgb(148_226_213/0.18),0_0_16px_rgb(148_226_213/0.6)]"
+              class="absolute top-[calc(var(--xp)*100%)] left-1/2 size-[11px] translate-x-[calc(-50%_+_var(--head-x,0px))] -translate-y-1/2 rounded-full bg-teal shadow-[0_0_0_4px_rgb(148_226_213/0.18),0_0_16px_rgb(148_226_213/0.6)]"
             />
           </div>
           <ol class="flex min-w-0 flex-1 flex-col gap-4">
@@ -106,7 +106,7 @@ const trailStyle = `mask-image:${trailMask()};mask-size:${TRAIL_TRACK}px ${TRAIL
       const xp = reduceMotion.matches ? 1 : Math.min(1, Math.max(0, (line - box.top) / box.height));
       tl.style.setProperty('--xp', xp.toFixed(4));
       // The head follows the trail's bends at the fill height.
-      tl.style.setProperty('--hx', `${trailX(xp * box.height).toFixed(2)}px`);
+      tl.style.setProperty('--head-x', `${trailX(xp * box.height).toFixed(2)}px`);
       tl.querySelectorAll<HTMLElement>('[data-dot]').forEach((dot) => {
         const d = dot.getBoundingClientRect();
         const y = d.top + d.height / 2 - box.top;
