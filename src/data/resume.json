@@ -68,6 +68,7 @@
   "education": [
     {
       "institution": "North-West University",
+      "logo": "/logos/nwu.png",
       "studyType": "BSc Honours",
       "area": "Computer Science & IT",
       "startDate": "2021",
@@ -78,6 +79,7 @@
     },
     {
       "institution": "North-West University",
+      "logo": "/logos/nwu.png",
       "studyType": "BSc",
       "area": "Information Technology",
       "startDate": "2017",
@@ -95,30 +97,48 @@
     {
       "name": "AWS Certified Cloud Practitioner",
       "issuer": "Amazon Web Services",
+      "logo": "/logos/aws.svg",
       "date": "2022",
       "url": "https://www.credly.com/badges/81710cf5-d6bb-4713-aeaf-9b9ba33950d9"
     },
     {
       "name": "Azure Cosmos DB Developer Specialty",
       "issuer": "Microsoft",
+      "logo": "/logos/cosmos-db.svg",
       "date": "2025",
       "url": "https://learn.microsoft.com/api/credentials/share/en-us/NeilFoxcroft-0087/CF6074E0DAA1EE3F?sharingId=2E038FCE2265453F"
     }
   ],
   "projects": [
     {
-      "id": "stylegan",
-      "name": "Identifying StyleGAN faces",
-      "kind": "Honours project",
-      "date": "2021",
-      "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained convolutional neural networks to tell those faces apart from photos of real people, and built a small web app to try the model on an image.",
-      "keywords": ["Deep learning", "CNNs", "Python", "LaTeX"],
-      "url": "https://github.com/neilfoxcroft/StyleGAN-Identification"
+      "id": "offset",
+      "name": "offset: days-since widget",
+      "kind": "Side project",
+      "date": "2026",
+      "summary": "A free, no-account days since / days until widget for iPhone, in about 200 lines of JavaScript.",
+      "description": "Every free \"days since\" app I used ended up behind a subscription, and paying monthly to subtract two dates felt wrong. So I wrote my own home-screen widget in about 200 lines of JavaScript for Scriptable: no subscription, no account, and the data never leaves the phone. It counts up and down, works in every widget size, lets each widget pick its own events, and follows the phone's light or dark mode with Catppuccin colours. A native SwiftUI app is next.",
+      "keywords": ["JavaScript", "Scriptable", "iOS widgets", "Catppuccin"],
+      "links": [{ "label": "view on github", "href": "https://github.com/neilfoxcroft/offset-scriptable", "icon": "github" }]
     },
     {
+      "id": "stylegan",
+      "name": "Identifying StyleGAN images",
+      "kind": "Thesis",
+      "date": "2021",
+      "summary": "A convolutional neural network that tells StyleGAN-generated faces from real photos, with 97.6% accuracy.",
+      "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained a convolutional neural network to tell those faces apart from photos of real people. Tuning it with Optuna took it from 61% to 97.6% accuracy, and a small Flask web app lets you try the model on an image. The repository has the full thesis and the web app.",
+      "keywords": ["Deep learning", "CNNs", "Python", "TensorFlow", "Optuna", "Flask", "LaTeX"],
+      "links": [
+        { "label": "view on github", "href": "https://github.com/neilfoxcroft/identifying-stylegan-images", "icon": "github" },
+        { "label": "watch the walkthrough", "href": "https://www.youtube.com/watch?v=MzG4RjvZbuo", "icon": "youtube" }
+      ]
+    },
+    {
+      "id": "blego",
       "name": "BLEGO: Braille-like toy blocks",
       "kind": "Patent",
       "date": "2017",
+      "summary": "Toy blocks that visually impaired children can build with and tell apart by touch.",
       "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
       "keywords": ["FIRST LEGO League", "Accessibility"]
     }
@@ -133,6 +153,7 @@
       "Germany",
       "Lesotho",
       "Madagascar",
+      "Mozambique",
       "United States of America"
     ],
     "usStates": ["California", "Oregon", "Washington", "New York", "Illinois", "Colorado", "Nevada", "Arizona"]

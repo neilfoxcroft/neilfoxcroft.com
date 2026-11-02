@@ -8,6 +8,9 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
   - [x] BSc Information Technology: RAG Technical Committee and residence activities (2026-10-29).
   - [x] BSc Honours: specialisations and the StyleGAN detection project (2026-10-29).
 - [x] **StyleGAN detection project** added to `projects` (2026-10-29), linking to the repo. Later: maybe a page of its own; the Honours box links to the project card (`#stylegan`).
+  - [x] Updated 2026-11-02 for the new combined repo `identifying-stylegan-images` (thesis PDF and video links, 97.6% result).
+- [x] **PCT photos open slowly** (fixed 2026-11-02): smaller full-size files, preloaded on hover/press, dialog waits until decoded.
+- [ ] **Check the iPhone map fix on a real iPhone after the next deploy** (2026-11-02): select photos (map section should match the profile), trace the map, tap off it (both should clear). Only tested with Chromium phone emulation.
 - [x] **PCT extras** in `pct`:
   - [x] days on trail (164: 14 Apr – 24 Sep 2026) and pairs of shoes (4), added 2026-10-29
   - [x] the intro story (2026-10-29)

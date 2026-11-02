@@ -66,7 +66,7 @@ export function buildPctMap() {
 
   // Hover samples: SAMPLES points spaced evenly along the route as drawn on the map, as a flat
   // [x0, y0, x1, y1, ...] list in SVG units. Sample i sits i / (SAMPLES - 1) of the way along (the same 0-to-1
-  // scale as --done and the section highlight), so the nearest sample to the cursor says how much to colour.
+  // scale as the map's colourings), so the nearest sample to the cursor says how much to colour.
   const SAMPLES = 400;
   const screen = coords.map((c) => projection(c)!);
   const cumulative = [0];
@@ -87,7 +87,7 @@ export function buildPctMap() {
   }
 
   // A place ([lon, lat]) -> the 0-to-1 position of the nearest trail point along the drawn route (the scale
-  // --done uses). Section ends are pinned to real places rather than converted from trail miles, because the
+  // the map's colourings use). Section ends are pinned to real places rather than converted from trail miles, because the
   // OSM line doesn't track the official mileage evenly (reroutes, alternates).
   const fractionAtPlace = ([lon, lat]: [number, number]): number => {
     const cosLat = Math.cos((lat * Math.PI) / 180);
@@ -107,9 +107,6 @@ export function buildPctMap() {
     contextStates: pick(states, CONTEXT_STATES),
     trailStates: pick(states, TRAIL_STATES),
     trail: path(trailFeature) ?? '',
-    // The route's length as drawn, in SVG units: the colourings turn their 0-to-1 positions into real dash
-    // lengths with it (the browser re-measures the drawn path exactly on load).
-    trailLength: +total.toFixed(1),
     samples,
     start: { x: Math.round(startX), y: Math.round(startY) },
     end: { x: Math.round(endX), y: Math.round(endY) },

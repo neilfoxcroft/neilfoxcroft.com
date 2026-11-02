@@ -59,9 +59,15 @@ const profileTicks = profileEnds.slice(1, -2);---
 
 <section id="pct" aria-label="Pacific Crest Trail" class="flex scroll-mt-24 flex-col gap-6">
   <SectionLabel text="pacific crest trail" />
-  <div class="flex flex-col gap-3">
-    <h3 class="m-0 text-[1.4rem] font-bold tracking-tight text-heading">{pct.heading}</h3>
-    <p class="m-0 max-w-[40rem]">{pct.intro}</p>
+  {/* The intro on a soft teal-to-mauve gradient (the PCT emblem's teal, the site's accent), with the emblem beside it. */}
+  <div class="flex flex-col gap-4 rounded-[14px] border border-line bg-linear-to-br from-teal/15 via-teal/[0.04] to-accent/12 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+    {/* public/logos/pct.webp: the emblem from Wikimedia Commons (public domain), with its see-through inside filled
+        white so the shield and lettering show on dark backgrounds. */}
+    <img src="/logos/pct.webp" alt="Pacific Crest Trail emblem" width="88" height="88" class="size-16 shrink-0 sm:size-[88px]" />
+    <div class="flex flex-col gap-3">
+      <h3 class="m-0 text-[1.4rem] font-bold tracking-tight text-heading">{pct.heading}</h3>
+      <p class="m-0 max-w-[40rem]">{pct.intro}</p>
+    </div>
   </div>
 
   <PctMap />
@@ -246,11 +252,15 @@ const profileTicks = profileEnds.slice(1, -2);---
                 class="m-auto max-h-[calc(100dvh-2rem)] w-fit max-w-[min(1200px,calc(100vw-2rem))] overflow-hidden rounded-[14px] border border-line bg-mantle p-0 text-text shadow-[0_30px_80px_rgb(0_0_0/0.6)] backdrop:bg-crust/80 backdrop:backdrop-blur-sm"
               >
                 <figure class="m-0 flex flex-col">
+                  {/* On landscape screens the photo's height is the limit (100vh less the caption), so `sizes` works
+                      out the width from its aspect ratio; otherwise browsers fetch a far bigger file than is shown. */}
                   <Image
                     src={ph.src}
                     alt={ph.alt}
-                    widths={[960, 1600, 2400]}
-                    sizes="90vw"
+                    widths={[640, 960, 1280, 1600]}
+                    sizes={`(orientation: portrait) 90vw, calc((100vh - 7rem) * ${(ph.src.width / ph.src.height).toFixed(3)})`}
+                    quality={70}
+                    data-photo-full
                     class="block h-auto max-h-[calc(100dvh-7rem)] w-auto max-w-full bg-crust object-contain"
                   />
                   <figcaption class="flex items-center justify-between gap-4 px-5 py-2 text-[0.8rem]">
@@ -364,14 +374,14 @@ const profileTicks = profileEnds.slice(1, -2);---
 </section>
 
 <script>
+  import { setDone, showSection, hideSection } from '../lib/pct-route-colour';
+
   // Selecting a photo lights up just that section of the map in its colour, filling up from the section's
   // start to its end, and shows its details in the readout.
   // - Hover or keyboard focus selects a photo, unless one is pinned.
   // - A click or tap pins it: hovering other photos (or the map) then leaves it alone. Clicking another photo
   //   pins that one; clicking anywhere else on the page unpins and clears.
   // - With nothing pinned, hovering the map switches back to its own Campo-to-cursor colouring.
-  const done = document.querySelector<SVGGElement>('[data-pct-done]');
-  const section = document.querySelector<SVGGElement>('[data-pct-section]');
   const startMarker = document.querySelector<SVGCircleElement>('[data-pct-start]');
   const endMarker = document.querySelector<SVGCircleElement>('[data-pct-end]');
   const readoutMark = document.querySelector<HTMLElement>('[data-pct-readout-mark]');
@@ -445,7 +455,7 @@ const profileTicks = profileEnds.slice(1, -2);---
     if (!active) return;
     active = undefined;
     tiles.forEach((t) => t.removeAttribute('data-active'));
-    section?.removeAttribute('data-active');
+    hideSection();
     resetMarkers();
     clearProfile();
     showReadout();
@@ -459,7 +469,7 @@ const profileTicks = profileEnds.slice(1, -2);---
     const to = Number(tile.dataset.to ?? 0);
     const colour = tile.dataset.colour ?? '';
     const seconds = 0.5 + (to - from) * 1.5; // longer sections take a little longer to fill
-    done?.style.setProperty('--done', '0'); // hide the map-hover colouring while a section is shown
+    setDone(0); // hide the map-hover colouring while a section is shown
 
     // Markers take the section colour: Start (a single point) rings the start marker; a section that begins
     // at Campo tints the start marker straight away; one that reaches the very end tints the end marker
@@ -471,18 +481,7 @@ const profileTicks = profileEnds.slice(1, -2);---
     startMarker?.toggleAttribute('data-tint', from === 0);
     if (to >= 1) endTimer = window.setTimeout(() => endMarker?.toggleAttribute('data-tint', true), seconds * 1000);
 
-    if (section) {
-      section.style.setProperty('--sec-color', colour);
-      section.style.setProperty('--sec-from', String(from));
-      // Restart the fill: jump back to zero length without animating, then animate to the section's length.
-      section.style.transition = 'none';
-      section.style.setProperty('--sec-len', '0');
-      getComputedStyle(section).getPropertyValue('--sec-len');
-      section.style.transition = '';
-      section.style.setProperty('--sec-duration', `${seconds.toFixed(2)}s`);
-      section.toggleAttribute('data-active', to > from);
-      section.style.setProperty('--sec-len', String(Math.max(0, to - from)));
-    }
+    showSection(from, to, colour, seconds);
     fillProfile(Number(tile.dataset.pfrom ?? 0), Number(tile.dataset.pto ?? 0), colour, seconds);
     showReadout();
   };
@@ -512,9 +511,17 @@ const profileTicks = profileEnds.slice(1, -2);---
     else clear();
   });
   // A click anywhere else (not a photo, the strip arrows, a photo dialog or the units switch) unpins and clears.
+  // Off the map and the profile it also clears their traced colouring and marker, so the two never disagree.
   document.addEventListener('click', (e) => {
     const target = e.target as Element | null;
-    if (!target?.closest('[data-pct-photo], [data-strip-arrow], [data-profile], dialog, [data-units-toggle]')) clear();
+    if (target?.closest('[data-pct-photo], [data-strip-arrow], [data-profile], dialog, [data-units-toggle]')) return;
+    clear();
+    if (target?.closest('[data-pct-map]')) return;
+    setDone(0);
+    clearProfile();
+    document.dispatchEvent(new CustomEvent('pct:map-leave'));
+    readoutState = null;
+    renderReadout();
   });
 
   // Touching or clicking the map itself counts as "elsewhere": it unpins, so the map can take over.
@@ -615,7 +622,7 @@ const profileTicks = profileEnds.slice(1, -2);---
       const box = profileEl.getBoundingClientRect();
       const x = Math.min(1, Math.max(0, (e.clientX - box.left) / box.width));
       const i = Math.round(x * (elev.length - 1));
-      done?.style.setProperty('--done', String(mapF[i] ?? 0));
+      setDone(mapF[i] ?? 0);
       showPoint(i);
     };
     let pendingScrub: PointerEvent | undefined;
@@ -656,11 +663,28 @@ const profileTicks = profileEnds.slice(1, -2);---
   // Press and hold a photo to see it full size (a click or tap only selects it, see above). While held, the tile
   // gets data-holding and fills up over HOLD_MS; letting go or moving the finger (swiping the strip) cancels.
   // Enter / Space on the focused photo opens it straight away.
+  // The full-size image is lazy, so it starts loading as soon as the photo is hovered, focused or pressed, and the
+  // dialog only opens once it is downloaded and decoded (the tile stays filled while it waits), so it never paints
+  // in bit by bit.
   const HOLD_MS = 500;
   document.querySelectorAll<HTMLButtonElement>('[data-photo-open]').forEach((button) => {
     const dialog = document.querySelector<HTMLDialogElement>(`[data-photo-dialog="${button.dataset.photoOpen}"]`);
     const tile = button.closest<HTMLElement>('[data-pct-photo]');
-    if (!dialog || !tile) return;
+    const full = dialog?.querySelector<HTMLImageElement>('[data-photo-full]');
+    if (!dialog || !tile || !full) return;
+    let ready: Promise<void> | undefined;
+    const preload = () => {
+      full.loading = 'eager';
+      ready ??= full.decode().catch(() => {}); // on a decode error, open anyway
+      return ready;
+    };
+    const open = async () => {
+      tile.toggleAttribute('data-holding', true);
+      await preload();
+      tile.removeAttribute('data-holding');
+      dialog.showModal();
+    };
+    for (const type of ['pointerenter', 'focus'] as const) button.addEventListener(type, preload);
     let timer: number | undefined;
     let start: [number, number] | undefined;
     const cancel = () => {
@@ -671,11 +695,12 @@ const profileTicks = profileEnds.slice(1, -2);---
     };
     button.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
+      preload();
       start = [e.clientX, e.clientY];
       tile.toggleAttribute('data-holding', true);
       timer = window.setTimeout(() => {
         cancel();
-        dialog.showModal();
+        open();
       }, HOLD_MS);
     });
     button.addEventListener('pointermove', (e) => {
@@ -686,7 +711,7 @@ const profileTicks = profileEnds.slice(1, -2);---
     button.addEventListener('contextmenu', (e) => e.preventDefault());
     // detail is 0 for clicks from the keyboard.
     button.addEventListener('click', (e) => {
-      if (e.detail === 0) dialog.showModal();
+      if (e.detail === 0) open();
     });
     dialog.querySelector('[data-photo-close]')?.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', (e) => {
