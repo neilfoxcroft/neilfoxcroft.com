@@ -35,6 +35,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - [x] New résumé PDF: the Reactive Resume export is now `public/files/NeilFoxcroftResume.pdf` (2026-10-29).
 - [x] Updated CV (2026-10-29): one page, no photo, new layout. Neil is fine with the phone number being public. A restyle to match the site colours is still optional.
 - [x] Shoprite Financial Services URL: links to the Shoprite Holdings financial services page (2026-10-29).
+- [x] Company logos in the experience section (2026-11-02): `public/logos/`, `logo` field in resume.json.
 - [ ] Check the site with reduced motion on (Windows: Settings → Accessibility → Visual effects → Animation effects off).
 - [x] **AWS CodeBuild source** (done 2026-10-29: pipeline cicd-neilfoxcroft now pulls neilfoxcroft/neilfoxcroft.com) (Neil, in the AWS console, eu-west-2): the GitHub repo was renamed to `neilfoxcroft/neilfoxcroft.com` on 2026-10-29 (was `neilfoxcroft.com-repo`). Point the CodeBuild project's source at the new name. GitHub redirects the old one, but don't rely on it, and never create a new repo called `neilfoxcroft.com-repo`, or the redirect breaks.
 - [ ] **Step 6, deploy** (plan agreed with Neil 2026-10-29; AWS profile `personal` = account 433102245367). Current setup, read-only look 2026-10-29:
