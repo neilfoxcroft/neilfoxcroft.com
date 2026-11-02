@@ -6,10 +6,24 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<ul class="mt-1 flex flex-wrap gap-2" aria-label="Technologies">
+{/* Small chips kept on one line; if they don't fit, the row scrolls sideways and fades out at the right edge. */}
+<ul
+  data-tags-scroll
+  class="mt-1 flex touch-pan-x gap-1.5 overflow-x-auto [scrollbar-width:none] data-more:mask-r-from-[calc(100%-2rem)] [&::-webkit-scrollbar]:hidden"
+  aria-label="Technologies"
+>
   {
     items.map((t) => (
-      <li class="rounded-full bg-accent/12 px-2.5 py-1 text-[0.75rem] leading-normal text-accent">{t}</li>
+      <li class="shrink-0 rounded-full bg-accent/12 px-2 py-0.5 text-[0.7rem] leading-normal whitespace-nowrap text-accent">{t}</li>
     ))
   }
 </ul>
+
+<script>
+  // data-more while there are chips hidden off the right edge, so the fade only shows when there's more to see.
+  document.querySelectorAll<HTMLElement>('[data-tags-scroll]').forEach((row) => {
+    const update = () => row.toggleAttribute('data-more', row.scrollLeft + row.clientWidth < row.scrollWidth - 1);
+    row.addEventListener('scroll', update, { passive: true });
+    new ResizeObserver(update).observe(row);
+  });
+</script>
