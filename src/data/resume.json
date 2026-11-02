@@ -109,14 +109,16 @@
     {
       "id": "stylegan",
       "name": "Identifying StyleGAN faces",
-      "kind": "Honours project · 2021",
+      "kind": "Honours project",
+      "date": "2021",
       "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained convolutional neural networks to tell those faces apart from photos of real people, and built a small web app to try the model on an image.",
       "keywords": ["Deep learning", "CNNs", "Python", "LaTeX"],
       "url": "https://github.com/neilfoxcroft/StyleGAN-Identification"
     },
     {
       "name": "BLEGO: Braille-like toy blocks",
-      "kind": "Patent · 2017",
+      "kind": "Patent",
+      "date": "2017",
       "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
       "keywords": ["FIRST LEGO League", "Accessibility"]
     }
