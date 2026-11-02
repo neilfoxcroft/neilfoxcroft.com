@@ -205,38 +205,18 @@ html[data-theme='light'] .theme-dark {
   }
 }
 
-/*
-  PCT map section highlight (PctMap.astro, driven by the photo strip in Pct.astro).
-  The overlay shows only the part of the route from --sec-from to --sec-from + --sec-len (both 0–1 of the
-  route's length) in --sec-color. They become real dash lengths through --trail-len, the route's drawn length
-  set on the map (pathLength isn't used: Safari ignores it for dashes). Registering --sec-len as a number lets
-  it animate, so a selected section "fills up" from its start to its end.
-*/
-@property --sec-len {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
+/* PCT map section highlight (PctMap.astro): src/lib/pct-route-colour.ts sets its colour and dashes; this fades it. */
 .pct-section {
-  --sec-from: 0;
-  --sec-color: #038285;
   fill: none;
-  stroke: var(--sec-color);
   opacity: 0;
   visibility: hidden;
   transition:
-    --sec-len var(--sec-duration, 0.8s) ease-out,
     opacity 0.2s,
     visibility 0.2s;
 }
 .pct-section[data-active] {
   opacity: 1;
   visibility: visible;
-}
-.pct-section use {
-  stroke-dasharray: calc(var(--sec-len) * var(--trail-len) * 1px) calc(var(--trail-len) * 2px);
-  stroke-dashoffset: calc(var(--sec-from) * var(--trail-len) * -1px);
 }
 
 /* Start / end markers: tinted with the selected section's colour when the section starts at Campo or its
