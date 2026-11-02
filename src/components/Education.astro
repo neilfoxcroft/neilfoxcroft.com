@@ -11,7 +11,7 @@ import { dateRange } from '../lib/format';
     native <dialog> with the details; every dialog is the same size. Esc, the close button or a click
     outside closes it.
   */}
-  <ul class="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+  <ul class="grid auto-rows-fr gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
     {
       resume.education.map((ed, i) => (
         <li class="flex">
@@ -19,23 +19,29 @@ import { dateRange } from '../lib/format';
             type="button"
             data-edu-open={i}
             aria-haspopup="dialog"
-            class="group flex w-full cursor-pointer flex-col gap-1.5 rounded-[10px] border border-line p-5 text-left transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
+            class="group flex w-full cursor-pointer items-center gap-3 rounded-[10px] border border-line px-4 py-2.5 text-left transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
           >
-            <span class="flex items-start justify-between gap-4">
-              <span class="text-[0.8rem] text-muted">{dateRange(ed.startDate, ed.endDate)}</span>
-              <span
-                aria-hidden="true"
-                class="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent transition-colors group-hover:bg-accent/25"
-              >
-                +
+            {/* The university's logo on a small white tile, like the certifications. */}
+            {ed.logo && (
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
+                <img src={ed.logo} alt="" width="24" height="24" class="size-full object-contain" />
               </span>
+            )}
+            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span class="text-[0.75rem] text-muted">
+                <span class="font-medium text-accent">{ed.studyType}</span> · {dateRange(ed.startDate, ed.endDate)}
+              </span>
+              <span class="text-[0.85rem] leading-snug font-semibold text-heading transition-colors group-hover:text-accent">
+                {ed.area}
+              </span>
+              <span class="text-[0.75rem] text-muted">{ed.institution}</span>
             </span>
-            <span class="text-[0.8rem] font-medium text-accent">{ed.studyType}</span>
-            <span class="text-[1rem] font-semibold text-heading transition-colors group-hover:text-accent">
-              {ed.area}
+            <span
+              aria-hidden="true"
+              class="flex size-6 shrink-0 items-center justify-center self-start rounded-full bg-accent/12 text-accent transition-colors group-hover:bg-accent/25"
+            >
+              +
             </span>
-            {/* mt-auto pins the university to the bottom so it lines up across cards. */}
-            <span class="mt-auto pt-1.5 text-[0.8rem] text-muted">{ed.institution}</span>
             <span class="sr-only">(show details)</span>
           </button>
 
@@ -101,7 +107,7 @@ import { dateRange } from '../lib/format';
     <SectionLabel text="certifications" sticky={false} />
   </div>
   {/* Each certification card links to its verification page (Credly / Microsoft Learn). */}
-  <ul class="grid gap-4 sm:grid-cols-2">
+  <ul class="grid gap-3 sm:grid-cols-2">
     {
       resume.certificates.map((c) => (
         <li class="flex">
@@ -109,18 +115,24 @@ import { dateRange } from '../lib/format';
             href={c.url}
             target="_blank"
             rel="noopener"
-            class="group flex w-full flex-col gap-1 rounded-[10px] border border-line px-5 py-4 transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
+            class="group flex w-full items-center gap-3 rounded-[10px] border border-line px-4 py-2.5 transition-colors hover:border-line-strong hover:bg-heading/[0.035]"
           >
-            <span class="flex items-start justify-between gap-4">
-              <span class="text-[0.95rem] font-semibold text-heading transition-colors group-hover:text-accent">
+            {/* The technology's logo on a small white tile, so dark logos (the AWS wordmark) show in dark mode too. */}
+            {c.logo && (
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
+                <img src={c.logo} alt="" width="24" height="24" class="size-full object-contain" />
+              </span>
+            )}
+            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span class="text-[0.85rem] leading-snug font-semibold text-heading transition-colors group-hover:text-accent">
                 {c.name}
               </span>
-              <span aria-hidden="true" class="text-accent">
-                ↗
+              <span class="text-[0.75rem] text-muted">
+                {c.issuer} · {c.date}
               </span>
             </span>
-            <span class="mt-auto text-[0.8rem] text-muted">
-              {c.issuer} · {c.date}
+            <span aria-hidden="true" class="shrink-0 self-start text-accent">
+              ↗
             </span>
             <span class="sr-only">(verify credential, opens in a new tab)</span>
           </a>
@@ -146,6 +158,8 @@ import { dateRange } from '../lib/format';
       dialog.close();
       target.scrollIntoView({ block: 'start' });
       history.pushState(null, '', hash);
+      // A project opens its details box straight away.
+      target.querySelector<HTMLButtonElement>('[data-project-open]')?.click();
     });
     // A click on the backdrop lands on the <dialog> element itself, not its content.
     dialog.addEventListener('click', (e) => {
