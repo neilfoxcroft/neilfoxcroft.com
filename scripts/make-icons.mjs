@@ -35,19 +35,30 @@ await writeFile(pub('favicon.svg'), mark);
 const square = mark.replace('rx="14"', 'rx="0"');
 await sharp(Buffer.from(square)).resize(180, 180).png().toFile(pub('apple-touch-icon.png'));
 
-// favicon.ico for older browsers: a single 32×32 PNG wrapped in a minimal ICO container.
-const png32 = await sharp(Buffer.from(mark)).resize(32, 32).png().toBuffer();
-const ico = Buffer.alloc(22);
-ico.writeUInt16LE(0, 0); // reserved
-ico.writeUInt16LE(1, 2); // type: icon
-ico.writeUInt16LE(1, 4); // one image
-ico.writeUInt8(32, 6); // width
-ico.writeUInt8(32, 7); // height
-ico.writeUInt16LE(1, 10); // colour planes
-ico.writeUInt16LE(32, 12); // bits per pixel
-ico.writeUInt32LE(png32.length, 14);
-ico.writeUInt32LE(22, 18); // image data offset
-await writeFile(pub('favicon.ico'), Buffer.concat([ico, png32]));
+// PNG favicons in multiples of 48px: Google's search results want at least 48×48 and ignore smaller icons.
+for (const size of [96, 192]) {
+  await sharp(Buffer.from(mark)).resize(size, size).png().toFile(pub(`favicon-${size}x${size}.png`));
+}
+
+// favicon.ico for older browsers: 16, 32 and 48px PNGs wrapped in a minimal ICO container.
+const sizes = [16, 32, 48];
+const pngs = await Promise.all(sizes.map((s) => sharp(Buffer.from(mark)).resize(s, s).png().toBuffer()));
+const header = Buffer.alloc(6 + 16 * sizes.length);
+header.writeUInt16LE(0, 0); // reserved
+header.writeUInt16LE(1, 2); // type: icon
+header.writeUInt16LE(sizes.length, 4); // number of images
+let offset = header.length;
+sizes.forEach((s, i) => {
+  const at = 6 + 16 * i;
+  header.writeUInt8(s, at); // width
+  header.writeUInt8(s, at + 1); // height
+  header.writeUInt16LE(1, at + 4); // colour planes
+  header.writeUInt16LE(32, at + 6); // bits per pixel
+  header.writeUInt32LE(pngs[i].length, at + 8);
+  header.writeUInt32LE(offset, at + 12); // image data offset
+  offset += pngs[i].length;
+});
+await writeFile(pub('favicon.ico'), Buffer.concat([header, ...pngs]));
 
 // Open Graph image, 1200×630: what LinkedIn, Slack, etc. show when the site is shared.
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -82,4 +93,4 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
 `;
 await sharp(Buffer.from(og)).png().toFile(pub('og-image.png'));
 
-console.log('Wrote favicon.svg, favicon.ico, apple-touch-icon.png, og-image.png to public/');
+console.log('Wrote favicon.svg, favicon.ico, favicon-96x96.png, favicon-192x192.png, apple-touch-icon.png, og-image.png to public/');

@@ -29,6 +29,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - Note: AWS Cost Explorer API calls cost $0.01 each; check costs in the console (Billing → Cost Explorer) instead of the CLI.
 
 - [ ] **After the next deploy: submit the sitemap** https://neilfoxcroft.com/sitemap.xml in Google Search Console (and Bing Webmaster Tools) so the new pages get indexed quickly.
+  - [ ] Also in Search Console: URL Inspection on https://neilfoxcroft.com/ → Request indexing, so Google refetches the favicon. On 2026-11-02 Google still showed the old "NF" icon; the 96/192px favicons added that day are what Google needs (at least 48px). Expect days to a couple of weeks.
 - [x] **Security headers on CloudFront** (live 2026-10-30; Neil ran `node infra/apply-security-headers.mjs`): the Free plan refuses custom response headers policies (tried 2026-10-30), so the script attaches AWS's managed Managed-SecurityHeadersPolicy (HSTS, nosniff, X-Frame-Options SAMEORIGIN, strict-origin-when-cross-origin referrer, X-XSS-Protection) and deletes the unused custom policy. The full CSP ships in the pages.
 - [ ] Minor: the default CloudFront address (d1397v5vx9uxmk.cloudfront.net) also serves the site; harmless (canonical tags point to neilfoxcroft.com), could redirect it later.
 
