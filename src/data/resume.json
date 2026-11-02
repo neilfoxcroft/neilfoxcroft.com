@@ -25,6 +25,7 @@
       "name": "Entelect",
       "position": "Software Engineer",
       "url": "https://www.entelect.co.za",
+      "logo": "/logos/entelect.png",
       "startDate": "2022",
       "summary": "Software consultancy. Placed with clients as a backend engineer, alongside work on Entelect's own initiatives.",
       "engagements": [
@@ -33,6 +34,7 @@
           "type": "Client",
           "description": "Money Market value-added services",
           "url": "https://www.shopriteholdings.co.za/group/brands/financial-services-customer-rewards.html",
+          "logo": "/logos/shoprite.png",
           "startDate": "2024",
           "endDate": "2026",
           "summary": "Built Kotlin and Spring Boot services for electricity, airtime and data, insurance, gift cards and bill payments. Designed Backend-for-Frontend endpoints so Checkers Sixty60 could reuse point-of-sale transaction services, owned the Namibia and Botswana electricity integrations end to end, and helped onboard developers and review code.",
@@ -43,6 +45,7 @@
           "type": "Client",
           "description": "Value Added Services",
           "url": "https://www.standardbank.co.za",
+          "logo": "/logos/standard-bank.png",
           "startDate": "2022",
           "endDate": "2024",
           "summary": "Developed Java and Spring Boot microservices for product catalogue, quote, order and settlement flows, and contributed to the MNO rewrite for airtime, data, SMS, electricity and lottery products. Migrated Angular front ends to micro-frontends in an Nx monorepo.",
@@ -53,6 +56,7 @@
           "type": "Internal",
           "description": "Cloud Squad, part-time",
           "url": "https://challenge.entelect.co.za",
+          "logo": "/logos/entelect-challenge.png",
           "startDate": "2022",
           "endDate": "2026",
           "summary": "Maintained the AWS infrastructure behind the competition platform: game engine, website, player portal, forum and submissions. Led the cloud team for a year, owning deployment pipelines and production support.",
@@ -105,14 +109,16 @@
     {
       "id": "stylegan",
       "name": "Identifying StyleGAN faces",
-      "kind": "Honours project · 2021",
+      "kind": "Honours project",
+      "date": "2021",
       "description": "StyleGAN generates faces of people who don't exist, convincing enough to pass a human check on a fake identity. For my Honours thesis I trained convolutional neural networks to tell those faces apart from photos of real people, and built a small web app to try the model on an image.",
       "keywords": ["Deep learning", "CNNs", "Python", "LaTeX"],
       "url": "https://github.com/neilfoxcroft/StyleGAN-Identification"
     },
     {
       "name": "BLEGO: Braille-like toy blocks",
-      "kind": "Patent · 2017",
+      "kind": "Patent",
+      "date": "2017",
       "description": "In the FIRST LEGO League, our team co-designed a registered design (ZA F2016/01587) that lets visually impaired children build with toy blocks and identify colours by touch. We also won the regional championship.",
       "keywords": ["FIRST LEGO League", "Accessibility"]
     }

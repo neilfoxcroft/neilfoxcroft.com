@@ -18,6 +18,8 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 
 ## Features to consider
 
+- [ ] **Skills page (idea, 2026-11-01, Neil):** a new page reached from below the PCT section: an otherwise blank page with all of Neil's skills floating around (e.g. the CV's skills: Java, Kotlin, Spring Boot, AWS, Terraform …). Not started; design it with Neil when he picks it up (how they move, link wording, mobile, reduced motion).
+
 - [ ] **Get in touch / contact**: a contact section on the page, or its own page. Today there's only the email icon in the header.
 - [ ] **km / mi switch design**: the current version (faint globe that grows into a `km │ mi` pill on hover, with a sliding highlight) is provisional, and the US flag is a placeholder drawing. Revisit the look (src/components/UnitToggle.astro).
 
@@ -27,6 +29,8 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - Note: AWS Cost Explorer API calls cost $0.01 each; check costs in the console (Billing → Cost Explorer) instead of the CLI.
 
 - [ ] **After the next deploy: submit the sitemap** https://neilfoxcroft.com/sitemap.xml in Google Search Console (and Bing Webmaster Tools) so the new pages get indexed quickly.
+  - Search Console is a Domain property for neilfoxcroft.com, verified by a TXT record in Route 53 (added 2026-11-02; the domain is registered at GoDaddy but its DNS is in Route 53). Keep both `google-site-verification` values on the TXT record: removing the `vUnm…` one un-verifies the property.
+  - [ ] Also in Search Console: URL Inspection on https://neilfoxcroft.com/ → Request indexing, so Google refetches the favicon. On 2026-11-02 Google still showed the old "NF" icon; the 96/192px favicons added that day are what Google needs (at least 48px). Expect days to a couple of weeks.
 - [x] **Security headers on CloudFront** (live 2026-10-30; Neil ran `node infra/apply-security-headers.mjs`): the Free plan refuses custom response headers policies (tried 2026-10-30), so the script attaches AWS's managed Managed-SecurityHeadersPolicy (HSTS, nosniff, X-Frame-Options SAMEORIGIN, strict-origin-when-cross-origin referrer, X-XSS-Protection) and deletes the unused custom policy. The full CSP ships in the pages.
 - [ ] Minor: the default CloudFront address (d1397v5vx9uxmk.cloudfront.net) also serves the site; harmless (canonical tags point to neilfoxcroft.com), could redirect it later.
 
@@ -35,6 +39,7 @@ Open work on neilfoxcroft.com. Content lives in `src/data/resume.json` unless no
 - [x] New résumé PDF: the Reactive Resume export is now `public/files/NeilFoxcroftResume.pdf` (2026-10-29).
 - [x] Updated CV (2026-10-29): one page, no photo, new layout. Neil is fine with the phone number being public. A restyle to match the site colours is still optional.
 - [x] Shoprite Financial Services URL: links to the Shoprite Holdings financial services page (2026-10-29).
+- [x] Company logos in the experience section (2026-11-02): `public/logos/`, `logo` field in resume.json.
 - [ ] Check the site with reduced motion on (Windows: Settings → Accessibility → Visual effects → Animation effects off).
 - [x] **AWS CodeBuild source** (done 2026-10-29: pipeline cicd-neilfoxcroft now pulls neilfoxcroft/neilfoxcroft.com) (Neil, in the AWS console, eu-west-2): the GitHub repo was renamed to `neilfoxcroft/neilfoxcroft.com` on 2026-10-29 (was `neilfoxcroft.com-repo`). Point the CodeBuild project's source at the new name. GitHub redirects the old one, but don't rely on it, and never create a new repo called `neilfoxcroft.com-repo`, or the redirect breaks.
 - [ ] **Step 6, deploy** (plan agreed with Neil 2026-10-29; AWS profile `personal` = account 433102245367). Current setup, read-only look 2026-10-29:
