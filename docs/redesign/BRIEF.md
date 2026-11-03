@@ -126,6 +126,7 @@ The site must be properly mobile friendly, not just "doesn't break". Build mobil
     - Neil tried a compact list style for projects and certifications (one thin row each) the same day and didn't like it; keep the card look.
     - The Honours box's "the StyleGAN project →" link now also opens the project's dialog.
     - Certifications stay two-column cards, but thinner (py-2.5, name 0.85rem, issuer · date 0.75rem) with the technology's logo on a small white tile on the left (`logo` in resume.json; public/logos/aws.svg and cosmos-db.svg, from devicon, MIT).
+    - **2026-11-03 (Neil):** certification cards show only the logo and the name (no issuer, no date: the issuer/date lines didn't line up when one name wrapped). Issuer and date stay in resume.json for the PDF résumé.
     - New project: "offset: days-since widget" (2026, Side project), Neil's free Scriptable widget for iPhone, linking to github.com/neilfoxcroft/offset-scriptable.
   - **Changed 2026-11-02 (Neil): education, page width, PCT emblem:**
     - Education cards are thin like the certifications: NWU logo on a small white tile (public/logos/nwu.png, NWU's own icon from nwu.ac.za; `logo` in resume.json), then "BSc Honours · 2021" (degree in accent), the area, and the university, with the "+" badge top right. Clicking still opens the same dialog.
