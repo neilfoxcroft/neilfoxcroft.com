@@ -123,15 +123,11 @@ import { dateRange } from '../lib/format';
                 <img src={c.logo} alt="" width="24" height="24" class="size-full object-contain" />
               </span>
             )}
-            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span class="text-[0.85rem] leading-snug font-semibold text-heading transition-colors group-hover:text-accent">
-                {c.name}
-              </span>
-              <span class="text-[0.75rem] text-muted">
-                {c.issuer} · {c.date}
-              </span>
+            {/* Logo and name only; issuer and date stay in resume.json for the PDF résumé. */}
+            <span class="min-w-0 flex-1 text-[0.85rem] leading-snug font-semibold text-heading transition-colors group-hover:text-accent">
+              {c.name}
             </span>
-            <span aria-hidden="true" class="shrink-0 self-start text-accent">
+            <span aria-hidden="true" class="shrink-0 text-accent">
               ↗
             </span>
             <span class="sr-only">(verify credential, opens in a new tab)</span>
